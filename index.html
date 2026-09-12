@@ -196,7 +196,7 @@ body::after{
   .cursor-glow{display:none;}
 }
 
-.container{max-width:960px;margin:0 auto;padding:0 24px;}
+.container{max-width:960px;margin:0 auto 0 0;padding:0 24px;}
 
 /* ---------- Top chrome / tab bar ---------- */
 .chrome{
@@ -691,6 +691,278 @@ h2.section-title::after{
   .back-to-top{right:16px;bottom:16px;width:38px;height:38px;}
 }
 
+/* ================================================================
+   AI ASSISTANT — floating avatar + expandable panel
+   Sits as a fixed widget above the back-to-top button; never takes
+   up in-flow layout space, so the rest of the portfolio is untouched.
+   ================================================================ */
+.ai-widget{
+  position:fixed;
+  right:24px;bottom:92px;
+  z-index:120;
+}
+
+/* ---------- Floating avatar (fab) ---------- */
+.ai-fab{
+  position:relative;
+  width:56px;height:56px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background:var(--bg-elevated);
+  color:var(--amber-fg);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:var(--shadow-lg);
+  transition:transform .25s var(--ease), border-color .2s var(--ease), box-shadow .25s var(--ease);
+}
+.ai-fab:hover{transform:translateY(-2px);border-color:var(--amber-fg);}
+.ai-fab:active{transform:translateY(0);}
+.ai-fab svg{width:24px;height:24px;transition:opacity .18s ease, transform .3s var(--ease);}
+.ai-fab .ai-fab-close-icon{position:absolute;opacity:0;transform:scale(.6) rotate(-45deg);}
+.ai-widget.open .ai-fab .ai-fab-bot-icon{opacity:0;transform:scale(.6) rotate(45deg);}
+.ai-widget.open .ai-fab .ai-fab-close-icon{opacity:1;transform:scale(1) rotate(0);}
+.ai-fab-dot{
+  position:absolute;top:-2px;right:-2px;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--green);
+  border:2.5px solid var(--bg);
+  animation:aiPulse 2s ease-out infinite;
+}
+@keyframes aiPulse{
+  0%{box-shadow:0 0 0 0 rgba(127,183,126,.45);}
+  70%{box-shadow:0 0 0 6px rgba(127,183,126,0);}
+  100%{box-shadow:0 0 0 0 rgba(127,183,126,0);}
+}
+@media (prefers-reduced-motion: reduce){
+  .ai-fab-dot{animation:none;}
+}
+
+/* ---------- Hover tooltip ---------- */
+.ai-fab-tooltip{
+  position:absolute;
+  right:68px;top:50%;
+  transform:translateY(-50%) translateX(4px);
+  white-space:nowrap;
+  font-family:var(--mono);font-size:12px;
+  color:var(--text);
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  padding:7px 12px;border-radius:7px;
+  box-shadow:var(--shadow-md);
+  opacity:0;pointer-events:none;
+  transition:opacity .18s var(--ease), transform .18s var(--ease);
+}
+.ai-widget:not(.open) .ai-fab:hover + .ai-fab-tooltip,
+.ai-widget:not(.open) .ai-fab:focus-visible + .ai-fab-tooltip{
+  opacity:1;transform:translateY(-50%) translateX(0);
+}
+@media (hover:none), (pointer:coarse){
+  .ai-fab-tooltip{display:none;}
+}
+
+/* ---------- Panel ---------- */
+.ai-panel{
+  position:absolute;
+  right:0;bottom:70px;
+  width:340px;
+  height:min(560px, 72vh);
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-top:3px solid var(--amber-fg);
+  border-radius:14px;
+  box-shadow:var(--shadow-lg);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  transform-origin:bottom right;
+  opacity:0;transform:scale(.92) translateY(12px);
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .22s var(--ease), transform .22s var(--ease), visibility 0s linear .22s;
+}
+.ai-widget.open .ai-panel{
+  opacity:1;transform:scale(1) translateY(0);
+  visibility:visible;pointer-events:auto;
+  transition:opacity .25s var(--ease), transform .25s var(--ease);
+}
+@media (prefers-reduced-motion: reduce){
+  .ai-panel{transition:opacity .15s linear, visibility 0s linear .15s;transform:none;}
+  .ai-widget.open .ai-panel{transform:none;transition:opacity .15s linear;}
+}
+
+.ai-panel-head{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 12px 12px 16px;
+  border-bottom:1px solid var(--border-soft);
+  flex-shrink:0;
+}
+.ai-head-icon{
+  width:30px;height:30px;border-radius:8px;
+  background:rgba(var(--amber-rgb),.14);
+  color:var(--amber-fg);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.ai-head-icon svg{width:16px;height:16px;}
+.ai-head-text{min-width:0;flex:1;}
+.ai-head-title{
+  font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ai-status{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:11px;color:var(--text-faint);
+  margin-top:2px;
+}
+.ai-status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.ai-panel-close{
+  width:28px;height:28px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:7px;border:1px solid transparent;
+  background:transparent;color:var(--text-faint);
+  cursor:pointer;
+  transition:color .15s var(--ease), border-color .15s var(--ease), background .15s var(--ease);
+}
+.ai-panel-close:hover{color:var(--text);background:var(--bg-hover);border-color:var(--border);}
+.ai-panel-close svg{width:14px;height:14px;}
+
+.ai-messages{
+  flex:1;min-height:0;
+  overflow-y:auto;
+  padding:14px 16px;
+  display:flex;flex-direction:column;gap:12px;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border) transparent;
+}
+.ai-messages::-webkit-scrollbar{width:7px;}
+.ai-messages::-webkit-scrollbar-track{background:transparent;}
+.ai-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px;}
+
+.ai-msg{display:flex;gap:9px;max-width:100%;}
+.ai-msg-bot{align-self:flex-start;}
+.ai-msg-user{align-self:flex-end;flex-direction:row-reverse;}
+.ai-avatar{
+  width:22px;height:22px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  flex-shrink:0;margin-top:1px;
+}
+.ai-msg-bot .ai-avatar{background:rgba(var(--amber-rgb),.16);color:var(--amber-fg);}
+.ai-msg-user .ai-avatar{background:var(--bg-hover);color:var(--text-dim);}
+.ai-bubble{
+  font-size:13px;line-height:1.55;
+  padding:9px 12px;border-radius:9px;
+  max-width:220px;
+  word-wrap:break-word;
+}
+.ai-msg-bot .ai-bubble{
+  background:var(--bg-panel);border:1px solid var(--border-soft);
+  color:var(--text-dim);border-top-left-radius:3px;
+}
+.ai-msg-user .ai-bubble{
+  background:rgba(var(--amber-rgb),.14);border:1px solid rgba(var(--amber-rgb),.3);
+  color:var(--text);border-top-right-radius:3px;
+}
+.ai-typing .ai-bubble{display:flex;align-items:center;gap:4px;padding:11px 12px;}
+.ai-typing-dot{width:5px;height:5px;border-radius:50%;background:var(--text-faint);animation:aiTypingBounce 1.1s ease-in-out infinite;}
+.ai-typing-dot:nth-child(2){animation-delay:.15s;}
+.ai-typing-dot:nth-child(3){animation-delay:.3s;}
+@keyframes aiTypingBounce{
+  0%,60%,100%{transform:translateY(0);opacity:.5;}
+  30%{transform:translateY(-3px);opacity:1;}
+}
+@media (prefers-reduced-motion: reduce){
+  .ai-typing-dot{animation:none;opacity:.8;}
+}
+
+/* ---------- Quick questions ---------- */
+.ai-quickwrap{
+  flex-shrink:0;
+  border-top:1px solid var(--border-soft);
+  max-height:40%;
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border) transparent;
+}
+.ai-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px 4px;}
+.ai-chip{
+  font-family:var(--mono);font-size:11px;color:var(--text-dim);
+  background:var(--bg-panel);
+  border:1px solid var(--border);border-radius:20px;
+  padding:6px 11px;cursor:pointer;
+  transition:border-color .18s var(--ease), color .18s var(--ease), transform .18s var(--ease);
+}
+.ai-chip:hover{border-color:var(--amber-fg);color:var(--amber-fg);transform:translateY(-1px);}
+
+.ai-viewmore{
+  display:flex;align-items:center;gap:5px;
+  margin:2px 14px 10px;
+  font-family:var(--mono);font-size:11px;color:var(--text-faint);
+  background:transparent;border:none;cursor:pointer;
+  padding:3px 2px;
+  transition:color .15s var(--ease);
+}
+.ai-viewmore:hover{color:var(--amber-fg);}
+.ai-viewmore svg{width:11px;height:11px;transition:transform .2s var(--ease);}
+.ai-viewmore.expanded svg{transform:rotate(180deg);}
+
+.ai-categories{padding:0 14px 10px;}
+.ai-cat{
+  border-top:1px solid var(--border-soft);
+}
+.ai-cat:first-child{border-top:none;}
+.ai-cat summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:center;gap:7px;
+  padding:8px 2px;
+  font-family:var(--mono);font-size:11.5px;color:var(--text-dim);
+  user-select:none;
+}
+.ai-cat summary::-webkit-details-marker{display:none;}
+.ai-cat summary .cat-chev{margin-left:auto;width:11px;height:11px;color:var(--text-faint);transition:transform .2s var(--ease);}
+.ai-cat[open] summary .cat-chev{transform:rotate(180deg);}
+.ai-cat summary:hover{color:var(--amber-fg);}
+.ai-cat-body{display:flex;flex-wrap:wrap;gap:6px;padding:2px 2px 10px;}
+
+.ai-inputrow{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 14px;
+  border-top:1px solid var(--border-soft);
+  flex-shrink:0;
+}
+.ai-input{
+  flex:1;min-width:0;
+  background:var(--bg-panel);
+  border:1px solid var(--border);
+  border-radius:7px;
+  padding:9px 12px;
+  font-family:var(--body);font-size:13px;color:var(--text);
+}
+.ai-input::placeholder{color:var(--text-faint);}
+.ai-input:focus{border-color:var(--amber-fg);}
+.ai-input:disabled{opacity:.6;cursor:not-allowed;}
+.ai-send{
+  width:34px;height:34px;flex-shrink:0;
+  border-radius:7px;border:1px solid var(--amber);
+  background:var(--amber);color:#14161a;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:transform .18s var(--ease), filter .18s var(--ease);
+}
+.ai-send:hover{filter:brightness(1.08);transform:translateY(-1px);}
+.ai-send:active{transform:translateY(0);}
+.ai-send svg{width:15px;height:15px;}
+.ai-send:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+@media (max-width:480px){
+  .ai-widget{right:14px;bottom:78px;}
+  .ai-panel{
+    width:calc(100vw - 28px);
+    height:min(66vh, 520px);
+    right:-4px;
+  }
+  .ai-fab{width:50px;height:50px;}
+}
+
 /* ---------- responsive ---------- */
 @media (max-width:720px){
   .pane{grid-template-columns:32px 1fr;}
@@ -1025,6 +1297,61 @@ h2.section-title::after{
 <button type="button" class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
+
+<!-- AI ASSISTANT — floating avatar + expandable panel -->
+<div class="ai-widget" id="aiWidget">
+  <button type="button" class="ai-fab" id="aiFabToggle" aria-haspopup="dialog" aria-expanded="false" aria-controls="aiPanel" aria-label="Ask Subhadip's AI assistant">
+    <svg class="ai-fab-bot-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 3h6"/><circle cx="9" cy="14" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="14" r="1.3" fill="currentColor" stroke="none"/><path d="M9 18h6"/></svg>
+    <svg class="ai-fab-close-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    <span class="ai-fab-dot" aria-hidden="true"></span>
+  </button>
+  <span class="ai-fab-tooltip" role="tooltip">Ask Subhadip's AI Assistant</span>
+
+  <div class="ai-panel" id="aiPanel" role="dialog" aria-modal="false" aria-label="Subhadip's AI assistant" aria-hidden="true">
+    <div class="ai-panel-head">
+      <div class="ai-head-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4M9 3h6"/><circle cx="9" cy="14" r="1.3" fill="currentColor" stroke="none"/><circle cx="15" cy="14" r="1.3" fill="currentColor" stroke="none"/><path d="M9 18h6"/></svg>
+      </div>
+      <div class="ai-head-text">
+        <div class="ai-head-title">Subhadip's AI Assistant</div>
+        <div class="ai-status"><span class="ai-status-dot" aria-hidden="true"></span>Available now</div>
+      </div>
+      <button type="button" class="ai-panel-close" id="aiPanelClose" aria-label="Minimize assistant">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="ai-messages" id="aiMessages" role="log" aria-live="polite" aria-label="Conversation with Subhadip's AI assistant">
+      <div class="ai-msg ai-msg-bot">
+        <div class="ai-avatar">AI</div>
+        <div class="ai-bubble">Hi! I'm Subhadip's AI assistant. Ask me anything about his skills, experience, projects, achievements, availability, or career.</div>
+      </div>
+    </div>
+
+    <div class="ai-quickwrap" id="aiQuickWrap">
+      <div class="ai-suggestions" id="aiSuggestions">
+        <button type="button" class="ai-chip" data-q="Who is Subhadip?">Who is Subhadip?</button>
+        <button type="button" class="ai-chip" data-q="Is Subhadip available to join ASAP?">Available to join ASAP?</button>
+        <button type="button" class="ai-chip" data-q="Is he open to relocation?">Open to relocation?</button>
+        <button type="button" class="ai-chip" data-q="What roles is he looking for?">Roles he's looking for</button>
+        <button type="button" class="ai-chip" data-q="Tell me about his projects">His projects</button>
+        <button type="button" class="ai-chip" data-q="Why should we hire Subhadip?">Why hire him?</button>
+      </div>
+      <button type="button" class="ai-viewmore" id="aiViewMore">
+        <span id="aiViewMoreLabel">View more questions</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="ai-categories" id="aiCategories" hidden></div>
+    </div>
+
+    <form class="ai-inputrow" id="aiForm" autocomplete="off">
+      <input type="text" class="ai-input" id="aiInput" placeholder="Ask about skills, projects…" autocomplete="off" aria-label="Type your question for the AI assistant" />
+      <button type="submit" class="ai-send" id="aiSend" aria-label="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 12 18-8-8 18-2-8-8-2Z"/></svg>
+      </button>
+    </form>
+  </div>
+</div>
 
 <script>
   /* ---------- Canvas starfield: twinkle + parallax, theme-aware, perf-conscious ---------- */
@@ -1521,6 +1848,371 @@ h2.section-title::after{
 
     // Compute the initial foreground variant for whatever theme/accent loaded.
     refreshForeground();
+  })();
+</script>
+
+<script>
+  /* ---------- AI Assistant — floating avatar, expandable panel, categorized Q&A ---------- */
+  (function () {
+    const widget = document.getElementById('aiWidget');
+    const fab = document.getElementById('aiFabToggle');
+    const panel = document.getElementById('aiPanel');
+    const closeBtn = document.getElementById('aiPanelClose');
+    const messagesEl = document.getElementById('aiMessages');
+    const formEl = document.getElementById('aiForm');
+    const inputEl = document.getElementById('aiInput');
+    const sendBtn = document.getElementById('aiSend');
+    const suggestionsEl = document.getElementById('aiSuggestions');
+    const viewMoreBtn = document.getElementById('aiViewMore');
+    const viewMoreLabel = document.getElementById('aiViewMoreLabel');
+    const categoriesEl = document.getElementById('aiCategories');
+    if (!widget || !fab || !panel || !formEl || !inputEl || !sendBtn) return;
+
+    /*
+     * Local knowledge base — every answer below is drawn directly from the
+     * portfolio/resume content on this page. Nothing here is invented; a
+     * question that doesn't match falls through to a clear "not available"
+     * reply rather than guessing.
+     *
+     * TO CONNECT A REAL AI API LATER:
+     * Replace the body of getResponse(query) with an async call to your
+     * backend/AI endpoint, e.g.:
+     *
+     *   async function getResponse(query) {
+     *     const res = await fetch('/api/assistant', {
+     *       method: 'POST',
+     *       headers: { 'Content-Type': 'application/json' },
+     *       body: JSON.stringify({ message: query })
+     *     });
+     *     const data = await res.json();
+     *     return data.reply;
+     *   }
+     *
+     * Then mark handleQuery as async and `await getResponse(query)` in place
+     * of the current call. The rest of the UI — typing indicator, message
+     * rendering, quick-question menu, auto-scroll, disabled/loading states —
+     * needs no changes, since handleQuery already wraps the call in try/catch.
+     */
+    const KB = [
+      { keywords: ['who is subhadip', 'who are you', 'introduce', 'quick introduction', 'tell me about him', 'tell me about yourself'],
+        response: "Subhadip Pati is a Java Backend Developer based in Gurugram, Haryana, India. He builds RESTful backend services with Java, Spring Boot and Spring Security, and is currently a Technical Consultant at BCloud Global Services working on Oracle Integration Cloud (OIC) integrations. He's also actively looking for new Java Backend Developer / Software Engineer opportunities and is available to join ASAP." },
+      { keywords: ['professional background'],
+        response: "He's a backend-focused engineer with a B.Tech in Computer Science from NITMAS (CGPA 8.21/10), professional experience at BCloud Global Services and Perennation Computer Solutions, and 1,550+ DSA problems solved on the side." },
+      { keywords: ['currently doing', 'what is he doing', 'currently working'],
+        response: "He's currently a Technical Consultant at BCloud Global Services (May 2025–present), building REST/SOAP API integrations on Oracle Integration Cloud and SQL-based data models across Oracle Fusion Cloud modules — while actively exploring new Java Backend Developer opportunities." },
+      { keywords: ['type of developer', 'what kind of developer'],
+        response: "He's a Java backend developer — his focus is RESTful APIs, Spring Boot services, secure authentication systems, and enterprise integrations, backed by strong SQL and core CS fundamentals." },
+
+      { keywords: ['strongest technical skill', 'technical skills', 'skill', 'technology', 'tech stack', 'stack'],
+        response: "His core stack: Java (8+), Spring Boot, Spring MVC, Spring Security, Hibernate/JPA, JDBC, RESTful & SOAP APIs, OAuth2, and MySQL — plus strong fundamentals in DSA, OOP, SOLID principles, and design patterns." },
+      { keywords: ['java technolog', 'java skills', 'core java'],
+        response: "In Java, he works with Core Java, Java 8+ features, Collections, and exception handling — the foundation under his Spring Boot services." },
+      { keywords: ['spring boot skill', 'spring boot'],
+        response: "His Spring Boot experience spans Spring MVC, Spring Security, Hibernate/JPA, and JDBC — used to build REST APIs like the Workforce Management and Smart Contact Management projects." },
+      { keywords: ['rest api', 'restful'],
+        response: "Yes — RESTful APIs are central to his work, alongside SOAP web services, API integration, and API testing with Postman." },
+      { keywords: ['spring security'],
+        response: "Yes — he's used Spring Security for authentication and authorization, including OAuth2 and role-based access control (RBAC), notably in the Smart Contact Management project." },
+      { keywords: ['database', 'mysql', 'sql'],
+        response: "He works primarily with MySQL — relational database design, query optimization, joins, indexing, and transactions — plus SQL and PL/SQL for Oracle Fusion Cloud data models." },
+      { keywords: ['backend technolog', 'backend and api'],
+        response: "On the backend side: RESTful APIs, SOAP web services, API integration, authentication & authorization (OAuth2, RBAC), and API testing with Postman." },
+      { keywords: ['tools and testing', 'tools he use', 'testing technolog'],
+        response: "His tooling: Git, GitHub, Maven, Gradle, JUnit for unit testing, Tomcat, debugging, Agile/SDLC practices, and Linux." },
+      { keywords: ['core cs fundamental', 'cs fundamentals', 'computer science fundamentals'],
+        response: "His CS fundamentals cover Data Structures & Algorithms, OOP, SOLID principles, design patterns, multithreading, DBMS, Operating Systems, and Computer Networks." },
+
+      { keywords: ['project'],
+        response: "Three highlights: EnterpriseWorkforceManagement (a Spring Boot task-management API with automated reassignment logic), SmartContactManagement (an OAuth2 + RBAC contact platform, +40% API speed), and HealthcareManagementSystem (a multi-role healthcare portal, +35% performance)." },
+      { keywords: ['workforce management'],
+        response: "EnterpriseWorkforceManagement is a Spring Boot backend for task management — it handles automated reassignment logic, filters out duplicate task allocations, and adds priority-based categorization and activity tracking, tested with JUnit and verified via Postman." },
+      { keywords: ['smart contact management', 'contact management system'],
+        response: "SmartContactManagement is a secure contact management platform with OAuth2 authentication, email verification, and role-based access control (RBAC). Optimizing its Spring Security workflows and SQL queries improved API response time by 40%." },
+      { keywords: ['healthcare management'],
+        response: "HealthcareManagementSystem is a multi-role healthcare portal backend for doctors, patients, and administrators, with role-specific access, appointment tracking, and notification management. SQL query optimization and caching lifted performance by 35%." },
+      { keywords: ['technologies were used', 'technologies used in his projects'],
+        response: "Across his projects: Spring Boot, RESTful APIs, Gradle, MapStruct, JUnit, Spring Security, OAuth2, MySQL, RBAC, Jakarta Servlets, JSP, and Tomcat." },
+      { keywords: ['problems did his projects solve', 'problem his project'],
+        response: "His projects solve real backend problems: preventing duplicate task allocations with smarter filtering, securing contact data with OAuth2/RBAC while cutting API latency, and giving a healthcare portal fast, role-specific access to records." },
+      { keywords: ['best demonstrates his backend', 'which project best'],
+        response: "SmartContactManagement is a strong showcase — it combines Spring Security, OAuth2, and RBAC with a measurable 40% API speed improvement, tying security work directly to performance." },
+
+      { keywords: ['current role', 'current position'],
+        response: "He's currently a Technical Consultant at BCloud Global Services, in Gurugram, since May 2025." },
+      { keywords: ['bcloud'],
+        response: "At BCloud Global Services, he builds and tests REST/SOAP API integrations on Oracle Integration Cloud (OIC), plus SQL-based data models and BI Publisher reports across Oracle Fusion Cloud. He owns integrations for Purchase Orders, Receipts, Suppliers, and Accounts Payables, including CSV/FBDI file processing." },
+      { keywords: ['oracle', 'oic', 'fusion'],
+        response: "His Oracle experience: REST/SOAP integrations on Oracle Integration Cloud (OIC), SQL-based data models and BI Publisher reports on Oracle Fusion Cloud, covering Purchase Orders, Receipts, Suppliers, and Accounts Payables modules." },
+      { keywords: ['previous role', 'what was his previous'],
+        response: "Before BCloud, he was a Trainee Software Engineer at Perennation Computer Solutions, Kolkata (Jan–Jun 2024)." },
+      { keywords: ['perennation'],
+        response: "At Perennation Computer Solutions, he built secure, role-based backend modules for a healthcare application using Java, Jakarta Servlets, JSP, and MySQL — resolving 15+ auth/session-management defects, lifting sign-up success by 25%, cutting login failures by 30%, and reducing page load time by 20% through SQL/indexing work." },
+      { keywords: ['professional java development experience', 'professional experience', 'java backend experience'],
+        response: "Yes — he has professional Java backend experience at both BCloud Global Services (Oracle Fusion/OIC REST & SOAP integrations, SQL data models) and Perennation Computer Solutions (secure, role-based backend modules with Java, Jakarta Servlets, JSP, and MySQL)." },
+      { keywords: ['major professional contribution'],
+        response: "Key contributions: owning Oracle Fusion API integrations at BCloud, and at Perennation, resolving 15+ authentication defects while improving sign-up success (+25%), login reliability (+30%), and page load time (-20%)." },
+
+      { keywords: ['how many dsa', 'dsa problems'],
+        response: "1,550+ DSA problems solved in total — 850+ on LeetCode and 700+ on GeeksforGeeks." },
+      { keywords: ['leetcode'],
+        response: "850+ problems solved on LeetCode, part of his 1,550+ total across platforms." },
+      { keywords: ['geeksforgeeks', 'gfg'],
+        response: "700+ problems solved on GeeksforGeeks, part of his 1,550+ total across platforms." },
+      { keywords: ['coding competition', 'brainbyte'],
+        response: "He placed 2nd Runner-up (3rd Rank) at BrainByte Battle, hosted by Aditya University via Unstop, representing NITMAS." },
+      { keywords: ['virtual job simulation', 'job simulations'],
+        response: "He's completed virtual job simulations from Goldman Sachs, J.P. Morgan, and the Infosys Power Programmer program." },
+      { keywords: ['other notable achievement', 'achievement', 'recognition', 'certificate', 'certification'],
+        response: "1,550+ DSA problems solved, Goldman Sachs / J.P. Morgan / Infosys Power Programmer job simulations, an Elastic Blogathon 2026 Certificate of Participation (selected among 100 nationwide), and 2nd Runner-up at BrainByte Battle." },
+
+      { keywords: ['what did subhadip study', 'what did he study'],
+        response: "He studied Computer Science for his B.Tech, with coursework in Data Structures & Algorithms, DBMS, Operating Systems, and Computer Networks." },
+      { keywords: ['b.tech', 'university', 'college', 'nitmas'],
+        response: "He completed his B.Tech in Computer Science at NITMAS, West Bengal." },
+      { keywords: ['cgpa'],
+        response: "His CGPA was 8.21 out of 10." },
+      { keywords: ['when did he graduate', 'graduate'],
+        response: "He completed his B.Tech between 2019 and 2023." },
+
+      { keywords: ['relocation', 'open to relocat', 'relocate'],
+        response: "Yes. Subhadip is open to relocating anywhere in India and is available to join ASAP." },
+      { keywords: ['available', 'availability', 'join asap', 'immediate', 'notice period'],
+        response: "Yes. Subhadip is actively looking for Java Backend Developer / Software Engineer opportunities and is available to join ASAP." },
+      { keywords: ['looking for', 'roles is he targeting', 'targeting', 'preferred role', 'what roles', 'what type of roles'],
+        response: "He's targeting Java Developer, Java Backend Developer, Spring Boot Developer, Backend Engineer, Software Engineer, and Associate Software Engineer roles." },
+      { keywords: ['current location', 'where is he located', 'where is subhadip located', 'where is he based'],
+        response: "He's currently based in Gurugram, Haryana, India." },
+      { keywords: ['why should i hire', 'why should we hire', 'why hire', 'why you'],
+        response: "A few reasons: hands-on Spring Boot/REST API experience, real enterprise integration work on Oracle Fusion/OIC, measurable wins on past projects (+40% API speed, +35% performance), and 1,550+ DSA problems solved — plus he's available to join ASAP and open to relocating anywhere in India." },
+      { keywords: ['strongest in', 'strongest tech'],
+        response: "His strongest areas are Java, Spring Boot, Spring Security, RESTful APIs, and MySQL, with real-world enterprise integration experience on Oracle Fusion/OIC." },
+      { keywords: ['contact', 'email', 'phone', 'reach', 'connect with him'],
+        response: "You can reach Subhadip at subhadippati30@gmail.com or +91 76998 40895, or find him on LinkedIn, GitHub, LeetCode, and GeeksforGeeks — all linked in the Contact section below." },
+      { keywords: ['resume'],
+        response: "There's a Resume.pdf download button in the Home section above — click it to view his resume." },
+      { keywords: ['github'],
+        response: "His GitHub is github.com/Spati01 — linked in the Contact section below, alongside his individual project repos." },
+      { keywords: ['linkedin'],
+        response: "His LinkedIn is linkedin.com/in/subhadippati01 — linked in the Contact section below." },
+      { keywords: ['portfolio projects', 'view his projects'],
+        response: "You can browse EnterpriseWorkforceManagement, SmartContactManagement, and HealthcareManagementSystem in the Projects section above, each with a link to its source code." },
+
+      { keywords: ['hello', 'hi', 'hey', 'greetings'],
+        response: "Hello! Ask me about Subhadip's skills, experience, projects, education, availability, or achievements — or tap one of the questions below." },
+      { keywords: ['thank'],
+        response: "You're welcome! Let me know if you'd like to know more about Subhadip's projects, experience, or how to get in touch." }
+    ];
+
+    const FALLBACK = "I don't have that information in my knowledge base yet. Try asking about Subhadip's skills, projects, experience, education, availability, or achievements — or reach him directly via the Contact section below.";
+
+    function getResponse(query) {
+      const q = query.toLowerCase();
+      for (const entry of KB) {
+        if (entry.keywords.some(function (k) { return q.indexOf(k) !== -1; })) {
+          return entry.response;
+        }
+      }
+      return FALLBACK;
+    }
+
+    /* ---------- Categorized quick-question menu ---------- */
+    const CATEGORIES = [
+      { icon: '👤', label: 'About Subhadip', questions: [
+        'Who is Subhadip?', 'Give me a quick introduction.', "What is Subhadip's professional background?",
+        'What is Subhadip currently doing?', 'What type of developer is he?'
+      ] },
+      { icon: '💻', label: 'Technical Skills', questions: [
+        "What are Subhadip's strongest technical skills?", 'What Java technologies does he know?',
+        'What Spring Boot skills does he have?', 'Does he know REST APIs?', 'Does he know Spring Security?',
+        'What databases does he work with?', 'What backend technologies does he use?',
+        'What tools and testing technologies does he use?', 'What are his core CS fundamentals?'
+      ] },
+      { icon: '🚀', label: 'Projects', questions: [
+        "Tell me about Subhadip's projects.", 'Tell me about the Workforce Management System.',
+        'Tell me about the Smart Contact Management System.', 'Tell me about the Healthcare Management System.',
+        'What technologies were used in his projects?', 'What problems did his projects solve?',
+        'Which project best demonstrates his backend skills?'
+      ] },
+      { icon: '💼', label: 'Experience', questions: [
+        "What is Subhadip's current role?", 'What does he do at BCloud Global Services?',
+        'What is his Oracle Fusion/OIC experience?', 'What was his previous role?',
+        'What did he work on at Perennation?', 'What is his Java backend experience?',
+        'What are his major professional contributions?'
+      ] },
+      { icon: '🏆', label: 'Achievements', questions: [
+        'How many DSA problems has Subhadip solved?', 'What are his LeetCode achievements?',
+        'What are his GeeksforGeeks achievements?', 'Which coding competitions has he participated in?',
+        'What virtual job simulations has he completed?', 'What other notable achievements does he have?'
+      ] },
+      { icon: '🎓', label: 'Education', questions: [
+        'What did Subhadip study?', 'Where did he complete his B.Tech?', 'What was his CGPA?', 'When did he graduate?'
+      ] },
+      { icon: '📋', label: 'Career / Hiring', questions: [
+        'Is Subhadip available to join ASAP?', 'Is he open to relocation?', 'What roles is he looking for?',
+        'What is his current location?', 'What technologies is he strongest in?', 'Why should we hire Subhadip?',
+        'What is his Java backend experience?', 'How can I contact him?', 'Can I view his resume?',
+        'Can I view his GitHub and LinkedIn?'
+      ] }
+    ];
+
+    function buildCategories() {
+      if (!categoriesEl || categoriesEl.childElementCount) return;
+      const frag = document.createDocumentFragment();
+      CATEGORIES.forEach(function (cat, i) {
+        const details = document.createElement('details');
+        details.className = 'ai-cat';
+        if (i === 0) details.open = true;
+        const summary = document.createElement('summary');
+        summary.innerHTML = cat.icon + ' ' + cat.label +
+          '<svg class="cat-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+        const body = document.createElement('div');
+        body.className = 'ai-cat-body';
+        cat.questions.forEach(function (q) {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'ai-chip';
+          chip.dataset.q = q;
+          chip.textContent = q;
+          body.appendChild(chip);
+        });
+        details.appendChild(summary);
+        details.appendChild(body);
+        frag.appendChild(details);
+      });
+      categoriesEl.appendChild(frag);
+    }
+
+    if (viewMoreBtn) {
+      viewMoreBtn.addEventListener('click', function () {
+        const expanded = viewMoreBtn.classList.toggle('expanded');
+        if (expanded) {
+          buildCategories();
+          categoriesEl.hidden = false;
+          viewMoreLabel.textContent = 'Show fewer questions';
+        } else {
+          categoriesEl.hidden = true;
+          viewMoreLabel.textContent = 'View more questions';
+        }
+      });
+    }
+
+    /* ---------- Open / close panel ---------- */
+    let lastFocused = null;
+    function openPanel() {
+      widget.classList.add('open');
+      fab.setAttribute('aria-expanded', 'true');
+      panel.setAttribute('aria-hidden', 'false');
+      lastFocused = document.activeElement;
+      setTimeout(function () { inputEl.focus(); }, 220);
+      document.addEventListener('keydown', onKeydown);
+      document.addEventListener('click', onOutsideClick, true);
+    }
+    function closePanel() {
+      widget.classList.remove('open');
+      fab.setAttribute('aria-expanded', 'false');
+      panel.setAttribute('aria-hidden', 'true');
+      document.removeEventListener('keydown', onKeydown);
+      document.removeEventListener('click', onOutsideClick, true);
+      if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+      else fab.focus();
+    }
+    function onKeydown(e) {
+      if (e.key === 'Escape') closePanel();
+    }
+    function onOutsideClick(e) {
+      if (!widget.contains(e.target)) closePanel();
+    }
+
+    fab.addEventListener('click', function () {
+      if (widget.classList.contains('open')) closePanel();
+      else openPanel();
+    });
+    if (closeBtn) closeBtn.addEventListener('click', closePanel);
+
+    /* ---------- Chat rendering ---------- */
+    function scrollToBottom() {
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function appendMessage(text, from) {
+      const row = document.createElement('div');
+      row.className = 'ai-msg ' + (from === 'user' ? 'ai-msg-user' : 'ai-msg-bot');
+      const avatar = document.createElement('div');
+      avatar.className = 'ai-avatar';
+      avatar.textContent = from === 'user' ? 'You' : 'AI';
+      const bubble = document.createElement('div');
+      bubble.className = 'ai-bubble';
+      bubble.textContent = text;
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      messagesEl.appendChild(row);
+      scrollToBottom();
+      return row;
+    }
+
+    function showTyping() {
+      const row = document.createElement('div');
+      row.className = 'ai-msg ai-msg-bot ai-typing';
+      row.innerHTML = '<div class="ai-avatar">AI</div><div class="ai-bubble"><span class="ai-typing-dot"></span><span class="ai-typing-dot"></span><span class="ai-typing-dot"></span></div>';
+      messagesEl.appendChild(row);
+      scrollToBottom();
+      return row;
+    }
+
+    // Guards against duplicate sends — set the instant a send starts,
+    // cleared only after the (simulated) response has finished rendering.
+    let isProcessing = false;
+
+    function setBusy(busy) {
+      isProcessing = busy;
+      sendBtn.disabled = busy;
+      inputEl.disabled = busy;
+      sendBtn.setAttribute('aria-busy', busy ? 'true' : 'false');
+    }
+
+    function handleQuery(rawText) {
+      if (isProcessing) return; // ignore re-entrant sends while a reply is in flight
+      const trimmed = (rawText || '').trim();
+      if (!trimmed) return; // never send empty messages
+
+      setBusy(true);
+      appendMessage(trimmed, 'user');
+      inputEl.value = ''; // clear the input as soon as the message is accepted
+
+      const typingRow = showTyping();
+      const delay = 380 + Math.random() * 340; // simulated "thinking" latency
+
+      setTimeout(function () {
+        try {
+          const reply = getResponse(trimmed);
+          typingRow.remove();
+          appendMessage(reply, 'bot');
+        } catch (err) {
+          // Graceful error handling instead of failing silently
+          if (typingRow && typingRow.isConnected) typingRow.remove();
+          appendMessage("Sorry, something went wrong while generating a response. Please try asking again.", 'bot');
+        } finally {
+          setBusy(false);
+          inputEl.focus();
+        }
+      }, delay);
+    }
+
+    // Single source of truth for sending: the form's submit event fires both
+    // on Send-button click (type="submit") and on Enter inside the text input,
+    // so both paths are guaranteed to behave identically.
+    formEl.addEventListener('submit', function (e) {
+      e.preventDefault(); // never reload/navigate the page
+      handleQuery(inputEl.value);
+    });
+
+    function onChipClick(e) {
+      const chip = e.target.closest('.ai-chip');
+      if (!chip) return;
+      handleQuery(chip.dataset.q || chip.textContent);
+    }
+    if (suggestionsEl) suggestionsEl.addEventListener('click', onChipClick);
+    if (categoriesEl) categoriesEl.addEventListener('click', onChipClick);
   })();
 </script>
 
