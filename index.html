@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subhadip Pati — Java Backend Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  // Apply any saved theme/accent before first paint, to avoid a flash of the wrong theme.
+  (function () {
+    try {
+      var root = document.documentElement;
+      var savedTheme = localStorage.getItem('portfolio-theme');
+      if (!savedTheme) {
+        savedTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      }
+      var isLight = savedTheme === 'light';
+      if (isLight) root.setAttribute('data-theme', 'light');
+
+      var accent = localStorage.getItem('portfolio-accent') || '#e3a85e';
+      root.style.setProperty('--amber', accent);
+      (function setRgb(hex) {
+        hex = hex.replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
+        var n = parseInt(hex, 16);
+        root.style.setProperty('--amber-rgb', ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255));
+      })(accent);
+
+      // Darken the accent for text use in light mode so it stays readable on a light background.
+      if (isLight) {
+        var hex = accent.replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
+        var num = parseInt(hex, 16);
+        var r = ((num >> 16) & 255) / 255, g = ((num >> 8) & 255) / 255, b = (num & 255) / 255;
+        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var h, s, l = (max + min) / 2;
+        if (max === min) { h = s = 0; }
+        else {
+          var d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch (max) {
+            case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+            case g: h = (b - r) / d + 2; break;
+            default: h = (r - g) / d + 4;
+          }
+          h /= 6;
+        }
+        l = Math.min(l, 0.36);
+        s = Math.max(s, 0.5);
+        function hue2rgb(p, q, t) {
+          if (t < 0) t += 1;
+          if (t > 1) t -= 1;
+          if (t < 1 / 6) return p + (q - p) * 6 * t;
+          if (t < 1 / 2) return q;
+          if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+          return p;
+        }
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        var rr = hue2rgb(p, q, h + 1 / 3), gg = hue2rgb(p, q, h), bb = hue2rgb(p, q, h - 1 / 3);
+        var toHex = function (c) { var v = Math.round(c * 255).toString(16); return v.length === 1 ? '0' + v : v; };
+        root.style.setProperty('--amber-fg', '#' + toHex(rr) + toHex(gg) + toHex(bb));
+      } else {
+        root.style.setProperty('--amber-fg', accent);
+      }
+    } catch (e) { /* storage unavailable — fall back to defaults */ }
+  })();
+</script>
+<style>
+:root{
+  --bg:#14161a;
+  --bg-panel:#1b1e24;
+  --bg-elevated:#22262e;
+  --bg-hover:#282c35;
+  --border:#33373f;
+  --border-soft:#2a2e36;
+  --text:#d4d8dc;
+  --text-dim:#7d8590;
+  --text-faint:#4d525c;
+  --amber:#e3a85e;
+  --amber-fg:#e3a85e;
+  --amber-rgb:227,168,94;
+  --green:#7fb77e;
+  --blue:#6fa8dc;
+  --red:#e37d7d;
+  --purple:#b490d1;
+  --mono:'JetBrains Mono', monospace;
+  --display:'Space Grotesk', sans-serif;
+  --body:'IBM Plex Sans', sans-serif;
+  --ease:cubic-bezier(.22,.9,.32,1);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.24);
+  --shadow-md:0 8px 24px -8px rgba(0,0,0,.4);
+  --shadow-lg:0 20px 48px -16px rgba(0,0,0,.5);
+}
+
+/* ---------- Light theme override ---------- */
+[data-theme="light"]{
+  --bg:#f7f6f3;
+  --bg-panel:#ffffff;
+  --bg-elevated:#ffffff;
+  --bg-hover:#eeece6;
+  --border:#dcd9d1;
+  --border-soft:#e6e3db;
+  --text:#2b2b28;
+  --text-dim:#5b5a55;
+  --text-faint:#8c8a83;
+  --green:#3f7a3e;
+  --blue:#2f6fa3;
+  --purple:#7c4f96;
+  --red:#c14f4f;
+  --shadow-sm:0 1px 2px rgba(20,20,18,.06);
+  --shadow-md:0 8px 24px -10px rgba(20,20,18,.14);
+  --shadow-lg:0 20px 48px -18px rgba(20,20,18,.18);
+}
+[data-theme="light"] .hero-name,
+[data-theme="light"] h2.section-title,
+[data-theme="light"] .proj-name,
+[data-theme="light"] .commit-msg{color:#1a1a18;}
+[data-theme="light"] body::after{opacity:.6;}
+[data-theme="light"] .commit-dot{box-shadow:0 0 0 3px var(--bg);}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;scrollbar-color:var(--amber-fg) var(--bg-panel);scrollbar-width:thin;}
+::-webkit-scrollbar{width:11px;height:11px;}
+::-webkit-scrollbar-track{background:var(--bg-panel);}
+::-webkit-scrollbar-thumb{background:var(--amber-fg);border-radius:8px;border:3px solid var(--bg-panel);}
+::-webkit-scrollbar-thumb:hover{background:var(--amber);}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  position:relative;
+  transition:background-color .25s ease, color .25s ease;
+}
+body,
+body *{
+  transition:background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+a{color:inherit;text-decoration:none;}
+::selection{background:var(--amber);color:#14161a;}
+:focus-visible{outline:2px solid var(--amber-fg);outline-offset:2px;border-radius:2px;}
+
+body::after{
+  content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 40% at 80% 0%, rgba(180,144,209,.10), transparent 60%),
+    radial-gradient(ellipse 50% 35% at 10% 100%, rgba(111,168,220,.08), transparent 60%);
+}
+
+/* ---------- Starfield (canvas-rendered, theme-aware) ---------- */
+:root{
+  --star-rgb:255,255,255;
+  --star-min-op:.16;
+  --star-max-op:1;
+  --star-glow-op:.55;
+}
+[data-theme="light"]{
+  --star-rgb:44,49,64;
+  --star-min-op:.34;
+  --star-max-op:.9;
+  --star-glow-op:.4;
+}
+.starfield{
+  position:fixed;inset:0;z-index:-2;
+  pointer-events:none;
+  display:block;
+  width:100%;height:100%;
+}
+
+/* ---------- Mouse-following ambient glow (desktop, fine-pointer only) ---------- */
+.cursor-glow{
+  position:fixed;top:0;left:0;
+  width:560px;height:560px;
+  margin:-280px 0 0 -280px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(var(--amber-rgb),.16), transparent 70%);
+  pointer-events:none;
+  z-index:-1;
+  opacity:0;
+  transition:opacity .5s var(--ease);
+  mix-blend-mode:overlay;
+  will-change:transform;
+}
+.cursor-glow.active{opacity:1;}
+@media (hover:none), (pointer:coarse){
+  .cursor-glow{display:none;}
+}
+@media (prefers-reduced-motion: reduce){
+  .cursor-glow{display:none;}
+}
+
+.container{max-width:960px;margin:0 auto;padding:0 24px;}
+
+/* ---------- Top chrome / tab bar ---------- */
+.chrome{
+  position:sticky;top:0;z-index:100;
+  background:var(--bg-panel);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(8px);
+  transition:box-shadow .25s var(--ease);
+}
+.chrome.scrolled{box-shadow:var(--shadow-md);}
+.scroll-progress{position:absolute;left:0;right:0;bottom:-2px;height:2px;background:transparent;}
+.scroll-progress-bar{
+  height:100%;width:0%;
+  background:linear-gradient(90deg, rgba(var(--amber-rgb),.5), var(--amber-fg));
+  transition:width .12s linear;
+}
+.chrome-titlebar{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border-soft);
+}
+.dot{width:11px;height:11px;border-radius:50%;}
+.dot.red{background:#e37d7d;}
+.dot.yellow{background:#e3c85e;}
+.dot.green{background:#7fb77e;}
+.chrome-path{
+  margin-left:12px;
+  font-family:var(--mono);
+  font-size:12.5px;
+  color:var(--text-dim);
+}
+.chrome-path .pkg{color:var(--purple);}
+.chrome-path .sep{color:var(--text-faint);}
+
+/* ---------- Prefs cluster: theme toggle + accent swatches ---------- */
+.prefs{
+  display:flex;align-items:center;gap:14px;
+  margin-left:auto;
+  padding-left:14px;
+}
+.theme-toggle{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:30px;height:30px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--bg-elevated);
+  color:var(--text-dim);
+  cursor:pointer;
+  flex-shrink:0;
+  transition:border-color .15s, color .15s, background .15s, transform .15s;
+}
+.theme-toggle:hover{color:var(--text);border-color:var(--text-faint);transform:translateY(-1px);}
+.theme-toggle svg{width:15px;height:15px;display:block;}
+.theme-toggle .icon-sun{display:none;}
+[data-theme="light"] .theme-toggle .icon-moon{display:none;}
+[data-theme="light"] .theme-toggle .icon-sun{display:block;}
+
+.accent-picker{display:flex;align-items:center;gap:6px;}
+.accent-swatch{
+  width:16px;height:16px;border-radius:50%;
+  border:1.5px solid var(--border);
+  cursor:pointer;padding:0;
+  transition:transform .15s, border-color .15s, box-shadow .15s;
+  flex-shrink:0;
+}
+.accent-swatch:hover{transform:translateY(-1px) scale(1.08);}
+.accent-swatch.active{border-color:var(--text);box-shadow:0 0 0 2px var(--bg), 0 0 0 3px var(--amber-fg);}
+
+@media (max-width:720px){
+  .prefs{gap:10px;padding-left:8px;}
+  .accent-picker{gap:5px;}
+}
+@media (max-width:560px){
+  .chrome-path{display:none;}
+}
+
+.tabs{
+  display:flex;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{
+  display:flex;align-items:center;gap:7px;
+  padding:11px 18px;
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--text-dim);
+  border-right:1px solid var(--border-soft);
+  white-space:nowrap;
+  cursor:pointer;
+  position:relative;
+  transition:color .15s, background .15s;
+}
+.tab:hover{color:var(--text);background:var(--bg-hover);}
+.tab.active{color:var(--text);background:var(--bg);}
+.tab::after{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--amber-fg);
+  opacity:0;transform:scaleX(.5);
+  transition:opacity .25s var(--ease), transform .25s var(--ease), background-color .2s ease;
+}
+.tab.active::after{opacity:1;transform:scaleX(1);}
+.tab .ext{color:var(--amber-fg);}
+.tab .dirty{color:var(--text-faint);font-size:10px;}
+
+/* ---------- Shared editor-pane look ---------- */
+.pane{
+  display:grid;
+  grid-template-columns:56px 1fr;
+}
+.gutter{
+  padding:64px 0 64px;
+  text-align:right;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--text-faint);
+  user-select:none;
+  border-right:1px solid var(--border-soft);
+}
+.gutter span{display:block;padding-right:14px;height:28px;line-height:28px;}
+.pane-body{padding:64px 32px 64px 32px;}
+section{border-bottom:1px solid var(--border-soft);}
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s var(--ease), transform .7s var(--ease);}
+.reveal.in-view{opacity:1;transform:translateY(0);}
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1;transform:none;transition:none;}
+}
+.eyebrow{
+  font-family:var(--mono);font-size:12.5px;color:var(--text-dim);
+  margin-bottom:10px;letter-spacing:.02em;
+}
+.eyebrow .kw{color:var(--purple);}
+.eyebrow .fn{color:var(--blue);}
+.eyebrow .an{color:var(--amber-fg);}
+h2.section-title{
+  font-family:var(--display);
+  font-size:clamp(24px,3.2vw,32px);
+  font-weight:600;
+  color:#fff;
+  margin-bottom:26px;
+  position:relative;
+  display:inline-block;
+}
+h2.section-title::after{
+  content:"";
+  display:block;
+  width:38px;height:3px;border-radius:2px;
+  margin-top:14px;
+  background:var(--amber-fg);
+}
+
+/* ---------- Hero ---------- */
+.hero .pane-body{padding-top:56px;}
+.code-line{
+  font-family:var(--mono);
+  font-size:clamp(13px,1.9vw,15.5px);
+  white-space:pre-wrap;
+}
+.kw{color:var(--purple);}
+.tp{color:var(--blue);}
+.str{color:var(--green);}
+.an{color:var(--amber-fg);}
+.cm{color:var(--text-faint);font-style:italic;}
+.fn{color:var(--blue);}
+.pn{color:var(--text-dim);}
+
+.hero{position:relative;}
+.hero .pane-body{position:relative;z-index:1;}
+.hero::before{
+  content:"";position:absolute;top:-40px;left:32px;width:420px;height:420px;
+  background:radial-gradient(circle, rgba(var(--amber-rgb),.16), transparent 70%);
+  pointer-events:none;z-index:0;
+}
+[data-theme="light"] .hero::before{opacity:.5;}
+.hero-name{
+  font-family:var(--display);
+  font-weight:700;
+  font-size:clamp(34px,6vw,58px);
+  color:#fff;
+  margin:22px 0 6px;
+  line-height:1.05;
+  letter-spacing:-.01em;
+}
+
+.hero .pane-body > *{
+  opacity:0;
+  animation:heroIn .6s var(--ease) forwards;
+}
+.hero .pane-body > *:nth-child(1){animation-delay:.02s;}
+.hero .pane-body > *:nth-child(2){animation-delay:.08s;}
+.hero .pane-body > *:nth-child(3){animation-delay:.14s;}
+.hero .pane-body > *:nth-child(4){animation-delay:.2s;}
+.hero .pane-body > *:nth-child(5){animation-delay:.26s;}
+.hero .pane-body > *:nth-child(6){animation-delay:.34s;}
+.hero .pane-body > *:nth-child(7){animation-delay:.42s;}
+.hero .pane-body > *:nth-child(8){animation-delay:.48s;}
+.hero .pane-body > *:nth-child(n+9){animation-delay:.54s;}
+@keyframes heroIn{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero .pane-body > *{animation:none;opacity:1;}
+}
+.hero-role{
+  font-family:var(--mono);
+  font-size:clamp(14px,2vw,17px);
+  color:var(--amber-fg);
+  margin-bottom:22px;
+}
+.hero-desc{
+  max-width:560px;
+  color:var(--text-dim);
+  font-size:15.5px;
+  margin-bottom:32px;
+}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:44px;}
+.btn{
+  font-family:var(--mono);font-size:13px;
+  padding:11px 20px;border-radius:7px;
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:transform .22s var(--ease), border-color .18s var(--ease), background .18s var(--ease), box-shadow .22s var(--ease), filter .18s var(--ease);
+  display:inline-flex;align-items:center;gap:8px;
+  box-shadow:var(--shadow-sm);
+}
+.btn-primary{background:var(--amber);color:#14161a;border-color:var(--amber);font-weight:600;}
+.btn-primary:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 10px 24px -8px rgba(var(--amber-rgb),.45);}
+.btn-primary:active{transform:translateY(0);}
+.btn-ghost{color:var(--text);background:transparent;}
+.btn-ghost:hover{border-color:var(--amber-fg);background:var(--bg-hover);color:var(--amber-fg);transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.btn-ghost:active{transform:translateY(0);}
+
+/* console output block */
+.console{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-top:3px solid var(--amber-fg);
+  border-radius:9px;
+  overflow:hidden;
+  max-width:640px;
+  box-shadow:var(--shadow-md);
+}
+.console-head{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px;
+  border-bottom:1px solid var(--border-soft);
+  font-family:var(--mono);font-size:11.5px;color:var(--text-faint);
+}
+.console-body{padding:16px 18px;font-family:var(--mono);font-size:13px;}
+.console-body .out-line{margin-bottom:6px;}
+.console-body .prompt{color:var(--green);}
+.console-body .val{color:var(--text);}
+.console-body .lbl{color:var(--text-dim);}
+.blink{display:inline-block;width:8px;height:15px;background:var(--amber);vertical-align:middle;animation:blink 1.1s steps(1) infinite;margin-left:2px;}
+@keyframes blink{50%{opacity:0;}}
+
+/* ---------- Terminal typing component ---------- */
+.type-term{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-top:3px solid var(--amber-fg);
+  border-radius:9px;
+  overflow:hidden;
+  max-width:640px;
+  margin-bottom:32px;
+  box-shadow:var(--shadow-md);
+}
+.type-term-head{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 14px;
+  border-bottom:1px solid var(--border-soft);
+  font-family:var(--mono);font-size:11.5px;color:var(--text-faint);
+}
+.type-term-head .dot{width:9px;height:9px;}
+.type-term-body{
+  padding:16px 18px 18px;
+  font-family:var(--mono);
+  font-size:13px;
+  min-height:150px;
+}
+.type-term-body .tt-line{margin-bottom:10px;}
+.type-term-body .tt-line:last-child{margin-bottom:0;}
+.tt-prompt-sym{color:var(--green);}
+.tt-cmd{color:var(--text);}
+.tt-out{color:var(--text-dim);display:block;margin-top:4px;padding-left:16px;}
+.tt-out .val{color:var(--amber-fg);}
+.tt-cursor{
+  display:inline-block;width:7px;height:14px;
+  background:var(--amber);vertical-align:middle;margin-left:2px;
+  animation:blink 1s steps(1) infinite;
+}
+.tt-sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;
+}
+@media (max-width:720px){
+  .type-term-body{font-size:12px;min-height:170px;}
+}
+
+/* ---------- About ---------- */
+.field-row{
+  display:grid;grid-template-columns:150px 1fr;
+  gap:4px 18px;
+  padding:10px 0;
+  border-bottom:1px dashed var(--border-soft);
+  font-size:14.5px;
+}
+.field-row:last-child{border-bottom:none;}
+.field-key{font-family:var(--mono);color:var(--blue);font-size:13px;}
+.field-val{color:var(--text-dim);}
+.about-lede{
+  max-width:600px;
+  color:var(--text);
+  font-size:16px;
+  margin-bottom:30px;
+}
+
+/* ---------- Skills as dependencies ---------- */
+.dep-file{
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-top:3px solid var(--amber-fg);
+  border-radius:9px;
+  overflow:hidden;
+  box-shadow:var(--shadow-md);
+}
+.dep-file-head{
+  padding:9px 16px;font-family:var(--mono);font-size:12px;color:var(--text-faint);
+  border-bottom:1px solid var(--border-soft);
+}
+.dep-group{padding:18px 20px 6px;}
+.dep-group-name{
+  font-family:var(--mono);font-size:12px;color:var(--text-faint);
+  margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em;
+}
+.dep-list{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px;}
+.dep{
+  font-family:var(--mono);font-size:12.5px;
+  padding:6px 11px;border-radius:6px;
+  background:var(--bg-panel);border:1px solid var(--border);
+  display:flex;align-items:baseline;gap:7px;
+  flex-wrap:wrap;max-width:100%;
+  transition:border-color .2s var(--ease), transform .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease);
+}
+.dep:hover{border-color:var(--amber-fg);transform:translateY(-2px);box-shadow:0 6px 16px -6px rgba(var(--amber-rgb),.35);background:var(--bg-hover);}
+.dep .name{min-width:0;}
+.dep .ver{color:var(--green);min-width:0;}
+.dep .name{color:var(--text);}
+.pane-body.reveal .dep{opacity:0;transition:opacity .45s var(--ease);transition-delay:calc(var(--i, 0) * 35ms);}
+.pane-body.reveal.in-view .dep{opacity:1;}
+@media (prefers-reduced-motion: reduce){
+  .pane-body.reveal .dep{opacity:1;transition:none;}
+}
+
+/* ---------- Projects as file explorer ---------- */
+.proj-list{display:flex;flex-direction:column;gap:14px;}
+.proj{
+  position:relative;
+  overflow:hidden;
+  background:var(--bg-elevated);
+  border:1px solid var(--border);
+  border-radius:9px;
+  padding:20px 22px;
+  transition:border-color .22s var(--ease), transform .22s var(--ease), box-shadow .22s var(--ease);
+  box-shadow:var(--shadow-sm);
+}
+.proj:hover{border-color:var(--amber-fg);transform:translateY(-3px);box-shadow:var(--shadow-lg);}
+.proj::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg, transparent, var(--amber-fg), transparent);
+  transform:scaleX(0);transform-origin:center;
+  transition:transform .45s var(--ease);
+}
+.proj:hover::before{transform:scaleX(1);}
+.pane-body.reveal .proj{opacity:0;transition:opacity .5s var(--ease);transition-delay:calc(var(--i, 0) * 70ms);}
+.pane-body.reveal.in-view .proj{opacity:1;}
+@media (prefers-reduced-motion: reduce){
+  .pane-body.reveal .proj{opacity:1;transition:none;}
+}
+.proj-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+.proj-name{font-family:var(--mono);font-size:15.5px;color:#fff;font-weight:600;}
+.proj-name .ext{color:var(--amber-fg);}
+.proj-stat{font-family:var(--mono);font-size:12px;white-space:nowrap;}
+.proj-stat .add{color:var(--green);}
+.proj-stat .del{color:var(--red);}
+.proj-desc{color:var(--text-dim);font-size:14.5px;margin-bottom:14px;max-width:640px;}
+.proj-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+.tag{
+  font-family:var(--mono);font-size:11.5px;color:var(--blue);
+  border:1px solid var(--border);padding:3px 9px;border-radius:4px;
+  transition:border-color .18s var(--ease), color .18s var(--ease);
+}
+.proj:hover .tag{border-color:var(--border-soft);}
+.proj-links{display:flex;gap:16px;}
+.proj-links a{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:12.5px;color:var(--text-dim);
+  border-bottom:1px solid transparent;
+  transition:color .18s var(--ease), border-color .18s var(--ease), padding-left .18s var(--ease);
+}
+.proj-links a:hover{color:var(--amber-fg);border-color:var(--amber-fg);padding-left:3px;}
+.proj-links a svg{width:13px;height:13px;flex-shrink:0;transition:transform .3s var(--ease);}
+.proj-links a:hover svg{transform:rotate(-12deg) scale(1.12);}
+
+/* ---------- Experience as git log ---------- */
+.commit{
+  display:grid;grid-template-columns:20px 1fr;gap:14px;
+  padding-bottom:28px;position:relative;
+}
+.commit:last-child{padding-bottom:0;}
+.commit-rail{position:relative;display:flex;justify-content:center;}
+.commit-rail::before{
+  content:"";position:absolute;top:16px;bottom:-28px;width:1px;background:var(--border);
+}
+.commit:last-child .commit-rail::before{display:none;}
+.commit-dot{
+  width:9px;height:9px;border-radius:50%;background:var(--amber);
+  margin-top:5px;flex-shrink:0;box-shadow:0 0 0 3px var(--bg), 0 0 0 6px rgba(var(--amber-rgb),.18);
+}
+.commit-hash{font-family:var(--mono);font-size:12px;color:var(--text-faint);}
+.commit-msg{font-family:var(--display);font-weight:600;font-size:16.5px;color:#fff;margin:2px 0 4px;}
+.commit-meta{font-family:var(--mono);font-size:12px;color:var(--text-dim);margin-bottom:8px;}
+.commit-meta .branch{color:var(--purple);}
+.commit-body{color:var(--text-dim);font-size:14.5px;max-width:600px;}
+.pane-body.reveal .commit{opacity:0;transition:opacity .5s var(--ease);transition-delay:calc(var(--i, 0) * 90ms);}
+.pane-body.reveal.in-view .commit{opacity:1;}
+@media (prefers-reduced-motion: reduce){
+  .pane-body.reveal .commit{opacity:1;transition:none;}
+}
+
+/* ---------- Contact / terminal ---------- */
+.term{
+  background:var(--bg-elevated);border:1px solid var(--border);border-top:3px solid var(--amber-fg);border-radius:9px;overflow:hidden;
+  box-shadow:var(--shadow-md);
+}
+.term-head{
+  padding:9px 16px;font-family:var(--mono);font-size:12px;color:var(--text-faint);
+  border-bottom:1px solid var(--border-soft);display:flex;align-items:center;gap:8px;
+}
+.term-body{padding:22px;font-family:var(--mono);font-size:14px;}
+.term-line{margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;}
+.term-line .p1{color:var(--green);}
+.term-line .p2{color:var(--blue);}
+.term-line .cmd{color:var(--text);}
+.contact-links{display:flex;flex-direction:column;gap:10px;margin-top:6px;}
+.contact-links a{
+  display:flex;align-items:center;gap:10px;
+  font-size:14.5px;color:var(--text);
+  padding:9px 0;
+  border-bottom:1px solid var(--border-soft);
+  transition:color .2s var(--ease), padding-left .2s var(--ease), border-color .2s var(--ease);
+}
+.contact-links a:hover{color:var(--amber-fg);padding-left:8px;border-color:var(--amber-fg);}
+.contact-links a .c-icon{width:16px;height:16px;flex-shrink:0;color:var(--text-faint);transition:color .2s var(--ease);}
+.contact-links a:hover .c-icon{color:var(--amber-fg);}
+.contact-links a .arrow{color:var(--text-faint);font-family:var(--mono);transition:color .2s var(--ease), transform .2s var(--ease);margin-left:auto;}
+.contact-links a:hover .arrow{color:var(--amber-fg);transform:translateX(2px);}
+
+/* ---------- Footer status bar ---------- */
+.statusbar{
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  padding:10px 24px;
+  background:var(--bg-panel);
+  border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:11.5px;color:var(--text-faint);
+}
+.statusbar .ok{color:var(--green);}
+.statusbar span{display:inline-flex;align-items:center;gap:6px;}
+
+/* ---------- Back to top ---------- */
+.back-to-top{
+  position:fixed;
+  right:24px;bottom:24px;
+  z-index:90;
+  width:42px;height:42px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--bg-elevated);
+  color:var(--text-dim);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  opacity:0;visibility:hidden;
+  transform:translateY(10px);
+  box-shadow:var(--shadow-md);
+  transition:opacity .25s var(--ease), transform .25s var(--ease), border-color .18s var(--ease), color .18s var(--ease);
+}
+.back-to-top.visible{opacity:1;visibility:visible;transform:translateY(0);}
+.back-to-top:hover{color:var(--amber-fg);border-color:var(--amber-fg);transform:translateY(-2px);}
+.back-to-top svg{width:17px;height:17px;display:block;}
+@media (max-width:720px){
+  .back-to-top{right:16px;bottom:16px;width:38px;height:38px;}
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  .pane{grid-template-columns:32px 1fr;}
+  .gutter{padding:40px 0;}
+  .gutter span{padding-right:8px;font-size:10.5px;}
+  .pane-body{padding:40px 18px;}
+  .field-row{grid-template-columns:110px 1fr;}
+  .hero .pane-body{padding-top:36px;}
+}
+</style>
+</head>
+<body>
+
+<canvas class="starfield" id="starfieldCanvas" aria-hidden="true"></canvas>
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+<header class="chrome">
+  <div class="scroll-progress" aria-hidden="true"><div class="scroll-progress-bar" id="scrollProgress"></div></div>
+  <div class="chrome-titlebar">
+    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+    <span class="chrome-path"><span class="pkg">com.subhadippati</span><span class="sep">.</span>portfolio<span class="sep">.</span>Main</span>
+
+    <div class="prefs">
+      <div class="accent-picker" id="accentPicker" role="group" aria-label="Accent color">
+        <button type="button" class="accent-swatch active" data-accent="#e3a85e" style="background:#e3a85e;" aria-label="Amber accent" title="Amber"></button>
+        <button type="button" class="accent-swatch" data-accent="#6fa8dc" style="background:#6fa8dc;" aria-label="Blue accent" title="Blue"></button>
+        <button type="button" class="accent-swatch" data-accent="#7fb77e" style="background:#7fb77e;" aria-label="Green accent" title="Green"></button>
+        <button type="button" class="accent-swatch" data-accent="#b490d1" style="background:#b490d1;" aria-label="Violet accent" title="Violet"></button>
+        <button type="button" class="accent-swatch" data-accent="#e37d7d" style="background:#e37d7d;" aria-label="Red accent" title="Red"></button>
+      </div>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle dark or light theme" title="Toggle theme">
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <a class="tab active" data-target="home" href="#home">Home<span class="ext">.java</span></a>
+    <a class="tab" data-target="about" href="#about">About<span class="ext">.java</span></a>
+    <a class="tab" data-target="skills" href="#skills">build<span class="ext">.gradle</span></a>
+    <a class="tab" data-target="projects" href="#projects">Projects<span class="ext">.java</span></a>
+    <a class="tab" data-target="experience" href="#experience">git<span class="ext">.log</span></a>
+    <a class="tab" data-target="achievements" href="#achievements">Achievements<span class="ext">.log</span></a>
+    <a class="tab" data-target="contact" href="#contact">Contact<span class="ext">.java</span><span class="dirty">●</span></a>
+  </nav>
+</header>
+
+<main class="container">
+
+  <!-- HOME / HERO -->
+  <section id="home" class="pane hero">
+    <div class="gutter"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div>
+    <div class="pane-body">
+      <div class="code-line"><span class="an">@Portfolio</span></div>
+      <div class="code-line"><span class="kw">public class</span> <span class="tp">SubhadipPati</span> <span class="kw">implements</span> <span class="tp">BackendEngineer</span> {</div>
+      <h1 class="hero-name">Subhadip Pati</h1>
+      <div class="hero-role">// Java Backend Developer — Spring Boot · REST APIs · Enterprise Integrations</div>
+      <p class="hero-desc">I build RESTful backend services with Java, Spring Boot, and Spring Security — clean data models, secure auth, and query-optimized MySQL underneath. Currently focused on enterprise integrations, backed by 1,550+ DSA problems solved across LeetCode and GeeksforGeeks.</p>
+
+      <!-- Terminal-style typing component -->
+      <div class="type-term" role="img" aria-label="Terminal animation reading: whoami — Subhadip, Java Backend Developer. cat skills.txt — Java plus Spring Boot plus REST APIs. echo dollar STATUS — building reliable backend systems. solved dash dash count dsa — 1550 plus problems and counting.">
+        <div class="type-term-head">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span style="margin-left:6px;">terminal — zsh</span>
+        </div>
+        <div class="type-term-body" id="typeTermBody" aria-hidden="true"></div>
+        <p class="tt-sr-only">
+          $ whoami — Subhadip, Java Backend Developer.
+          $ cat skills.txt — Java + Spring Boot + REST APIs.
+          $ echo $STATUS — building reliable backend systems.
+          $ solved --count dsa — 1550+ problems and counting.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">View Projects →</a>
+        <a href="#contact" class="btn btn-ghost">Get in touch</a>
+        <!-- TODO: replace with your real Google Drive share link -->
+        <a href="YOUR_GOOGLE_DRIVE_LINK" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">↓ Resume.pdf</a>
+      </div>
+
+      <div class="console">
+        <div class="console-head">Console — run: Main.main()</div>
+        <div class="console-body">
+          <div class="out-line"><span class="prompt">&gt;</span> <span class="lbl">Compiling...</span> <span class="val">BUILD SUCCESSFUL</span></div>
+          <div class="out-line"><span class="lbl">DSA Solved:</span> <span class="val">1,550+ (850+ LeetCode · 700+ GfG)</span></div>
+          <div class="out-line"><span class="lbl">Stack:</span> <span class="val">Java 8+ · Spring Boot · Hibernate/JPA · MySQL · REST APIs</span></div>
+          <div class="out-line"><span class="lbl">Currently:</span> <span class="val">Technical Consultant @ BCloud Global Services</span><span class="blink"></span></div>
+        </div>
+      </div>
+      <div class="code-line" style="margin-top:28px;">}</div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="pane">
+    <div class="gutter"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+    <div class="pane-body">
+      <div class="eyebrow"><span class="kw">class</span> <span class="fn">About</span> <span class="pn">{</span></div>
+      <h2 class="section-title">A bit of context</h2>
+      <p class="about-lede">I'm a backend developer who likes turning business requirements into secure, well-tested APIs — from enterprise integrations on Oracle Integration Cloud to role-based access systems built with Spring Security. Off the clock, a good chunk of my time goes into LeetCode and GeeksforGeeks, where I've crossed 1,550+ problems solved.</p>
+      <div>
+        <div class="field-row"><div class="field-key">location</div><div class="field-val">Gurugram, Haryana, India</div></div>
+        <div class="field-row"><div class="field-key">focus</div><div class="field-val">Backend APIs, enterprise integrations, secure authentication systems</div></div>
+        <div class="field-row"><div class="field-key">currently</div><div class="field-val">Technical Consultant, BCloud Global Services</div></div>
+        <div class="field-row"><div class="field-key">previously</div><div class="field-val">Perennation Computer Solutions</div></div>
+        <div class="field-row"><div class="field-key">education</div><div class="field-val">B.Tech, Computer Science — NITMAS (CGPA: 8.21/10)</div></div>
+        <div class="field-row"><div class="field-key">off the clock</div><div class="field-val">Competitive programming — 1,550+ problems across LeetCode &amp; GeeksforGeeks</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS as dependencies -->
+  <section id="skills" class="pane">
+    <div class="gutter"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+    <div class="pane-body">
+      <div class="eyebrow"><span class="fn">dependencies</span> <span class="pn">{</span></div>
+      <h2 class="section-title">What I build with</h2>
+      <div class="dep-file">
+        <div class="dep-file-head">build.gradle.kts — implementation</div>
+
+        <div class="dep-group">
+          <div class="dep-group-name">Programming Languages</div>
+          <div class="dep-list">
+            <span class="dep"><span class="name">Java</span><span class="ver">Core Java · Java 8+ · Collections · Exception Handling</span></span>
+            <span class="dep"><span class="name">SQL</span></span>
+            <span class="dep"><span class="name">PL/SQL</span></span>
+          </div>
+        </div>
+
+        <div class="dep-group">
+          <div class="dep-group-name">Frameworks &amp; Libraries</div>
+          <div class="dep-list">
+            <span class="dep"><span class="name">Spring Boot</span></span>
+            <span class="dep"><span class="name">Spring MVC</span></span>
+            <span class="dep"><span class="name">Spring Security</span></span>
+            <span class="dep"><span class="name">Hibernate</span><span class="ver">JPA</span></span>
+            <span class="dep"><span class="name">JDBC</span></span>
+            <span class="dep"><span class="name">Jakarta EE</span><span class="ver">Servlets · JSP</span></span>
+          </div>
+        </div>
+
+        <div class="dep-group">
+          <div class="dep-group-name">Backend &amp; APIs</div>
+          <div class="dep-list">
+            <span class="dep"><span class="name">RESTful APIs</span></span>
+            <span class="dep"><span class="name">SOAP Web Services</span></span>
+            <span class="dep"><span class="name">API Integration</span></span>
+            <span class="dep"><span class="name">Authentication &amp; Authorization</span></span>
+            <span class="dep"><span class="name">OAuth2</span></span>
+            <span class="dep"><span class="name">Role-Based Access Control</span><span class="ver">RBAC</span></span>
+            <span class="dep"><span class="name">API Testing</span><span class="ver">Postman</span></span>
+          </div>
+        </div>
+
+        <div class="dep-group">
+          <div class="dep-group-name">Databases</div>
+          <div class="dep-list">
+            <span class="dep"><span class="name">MySQL</span></span>
+            <span class="dep"><span class="name">Relational Database Design</span></span>
+            <span class="dep"><span class="name">Query Optimization</span></span>
+            <span class="dep"><span class="name">Joins</span></span>
+            <span class="dep"><span class="name">Indexing</span></span>
+            <span class="dep"><span class="name">Transactions</span></span>
+          </div>
+        </div>
+
+        <div class="dep-group">
+          <div class="dep-group-name">Core Computer Science</div>
+          <div class="dep-list">
+            <span class="dep"><span class="name">Data Structures &amp; Algorithms</span></span>
+            <span class="dep"><span class="name">OOP</span></span>
+            <span class="dep"><span class="name">SOLID Principles</span></span>
+            <span class="dep"><span class="name">Design Patterns</span></span>
+            <span class="dep"><span class="name">Multithreading</span></span>
+            <span class="dep"><span class="name">DBMS</span></span>
+            <span class="dep"><span class="name">Operating Systems</span></span>
+            <span class="dep"><span class="name">Computer Networks</span></span>
+          </div>
+        </div>
+
+        <div class="dep-group">
+          <div class="dep-group-name">Tools &amp; Testing</div>
+          <div class="dep-list">
+            <span class="dep"><span class="name">Git</span></span>
+            <span class="dep"><span class="name">GitHub</span></span>
+            <span class="dep"><span class="name">Maven</span></span>
+            <span class="dep"><span class="name">Gradle</span></span>
+            <span class="dep"><span class="name">JUnit</span><span class="ver">Unit Testing</span></span>
+            <span class="dep"><span class="name">Tomcat</span></span>
+            <span class="dep"><span class="name">Debugging</span></span>
+            <span class="dep"><span class="name">Agile/SDLC</span></span>
+            <span class="dep"><span class="name">Linux</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects" class="pane">
+    <div class="gutter"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+    <div class="pane-body">
+      <div class="eyebrow"><span class="kw">package</span> <span class="pn">projects;</span></div>
+      <h2 class="section-title">Selected work</h2>
+
+      <div class="proj-list">
+        <div class="proj">
+          <div class="proj-head">
+            <div class="proj-name">EnterpriseWorkforceManagement<span class="ext">.java</span></div>
+          </div>
+          <p class="proj-desc">A Spring Boot backend for task management, with automated reassignment logic and intelligent filtering to prevent duplicate task allocations. Adds priority-based task categorization and activity tracking, with unit tests in JUnit and REST endpoints verified through Postman.</p>
+          <div class="proj-tags"><span class="tag">Spring Boot</span><span class="tag">RESTful APIs</span><span class="tag">Gradle</span><span class="tag">MapStruct</span><span class="tag">JUnit</span></div>
+          <div class="proj-links"><a href="https://github.com/Spati01/WorkforceManagementAPI" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2-.2 4.5-1 4.5-4.5a3.5 3.5 0 0 0-1-2.5 3.3 3.3 0 0 0-.1-2.5s-.9-.3-2.9 1a10 10 0 0 0-5 0c-2-1.3-2.9-1-2.9-1a3.3 3.3 0 0 0-.1 2.5 3.5 3.5 0 0 0-1 2.5c0 3.5 2.5 4.3 4.5 4.5-.3.3-.5.7-.5 1.3v3.7"/></svg>Source →</a></div>
+        </div>
+
+        <div class="proj">
+          <div class="proj-head">
+            <div class="proj-name">SmartContactManagement<span class="ext">.java</span></div>
+            <div class="proj-stat"><span class="add">+40% API speed</span></div>
+          </div>
+          <p class="proj-desc">A secure contact management platform with OAuth2 authentication, email verification, and role-based access control (RBAC). Optimized Spring Security workflows and SQL queries to improve API response time.</p>
+          <div class="proj-tags"><span class="tag">Spring Boot</span><span class="tag">Spring Security</span><span class="tag">OAuth2</span><span class="tag">MySQL</span><span class="tag">RBAC</span></div>
+          <div class="proj-links"><a href="https://github.com/Spati01/SCM2.0" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2-.2 4.5-1 4.5-4.5a3.5 3.5 0 0 0-1-2.5 3.3 3.3 0 0 0-.1-2.5s-.9-.3-2.9 1a10 10 0 0 0-5 0c-2-1.3-2.9-1-2.9-1a3.3 3.3 0 0 0-.1 2.5 3.5 3.5 0 0 0-1 2.5c0 3.5 2.5 4.3 4.5 4.5-.3.3-.5.7-.5 1.3v3.7"/></svg>Source →</a></div>
+        </div>
+
+        <div class="proj">
+          <div class="proj-head">
+            <div class="proj-name">HealthcareManagementSystem<span class="ext">.java</span></div>
+            <div class="proj-stat"><span class="add">+35% performance</span></div>
+          </div>
+          <p class="proj-desc">A multi-role healthcare portal backend for doctors, patients, and administrators, with role-specific access, appointment tracking, and notification management. SQL query optimization and database caching drove the performance gains.</p>
+          <div class="proj-tags"><span class="tag">Jakarta Servlets</span><span class="tag">JSP</span><span class="tag">MySQL</span><span class="tag">Tomcat</span></div>
+          <div class="proj-links"><a href="https://github.com/Spati01/Healthcare-Management-System" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2-.2 4.5-1 4.5-4.5a3.5 3.5 0 0 0-1-2.5 3.3 3.3 0 0 0-.1-2.5s-.9-.3-2.9 1a10 10 0 0 0-5 0c-2-1.3-2.9-1-2.9-1a3.3 3.3 0 0 0-.1 2.5 3.5 3.5 0 0 0-1 2.5c0 3.5 2.5 4.3 4.5 4.5-.3.3-.5.7-.5 1.3v3.7"/></svg>Source →</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE as git log -->
+  <section id="experience" class="pane">
+    <div class="gutter"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+    <div class="pane-body">
+      <div class="eyebrow"><span class="fn">git log</span> <span class="pn">--author="subhadip" --reverse</span></div>
+      <h2 class="section-title">Career history</h2>
+
+      <div class="commits">
+        <div class="commit">
+          <div class="commit-rail"><div class="commit-dot"></div></div>
+          <div>
+            <div class="commit-hash">commit 8e21f4a <span class="branch">(HEAD → main)</span></div>
+            <div class="commit-msg">Technical Consultant — BCloud Global Services</div>
+            <div class="commit-meta">May 2025 — present · Gurugram</div>
+            <div class="commit-body">Build and test REST and SOAP API integrations on Oracle Integration Cloud (OIC), plus SQL-based data models and BI Publisher reports across Oracle Fusion Cloud tables. Own API integrations for Purchase Orders, Receipts, Suppliers, and Accounts Payables modules, including CSV/FBDI-based file processing, while debugging integration failures and SQL/web-service issues across environments.</div>
+          </div>
+        </div>
+        <div class="commit">
+          <div class="commit-rail"><div class="commit-dot"></div></div>
+          <div>
+            <div class="commit-hash">commit 3c05b91</div>
+            <div class="commit-msg">Trainee Software Engineer — Perennation Computer Solutions</div>
+            <div class="commit-meta">Jan 2024 — Jun 2024 · Kolkata</div>
+            <div class="commit-body">Built secure, role-based backend modules for a healthcare management application with Java, Jakarta Servlets, JSP, and MySQL. Resolved 15+ authentication and session-management defects, lifting sign-up success by 25% and cutting login failures by 30%, and optimized SQL/indexing to reduce page load time by 20%.</div>
+          </div>
+        </div>
+        <div class="commit">
+          <div class="commit-rail"><div class="commit-dot"></div></div>
+          <div>
+            <div class="commit-hash">commit 1f7a3d0</div>
+            <div class="commit-msg">Initial commit — B.Tech, Computer Science</div>
+            <div class="commit-meta">2019 — 2023 · NITMAS, West Bengal</div>
+            <div class="commit-body">Graduated with a CGPA of 8.21/10, with coursework spanning Data Structures & Algorithms, DBMS, Operating Systems, and Computer Networks.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACHIEVEMENTS -->
+  <section id="achievements" class="pane">
+    <div class="gutter"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+    <div class="pane-body">
+      <div class="eyebrow"><span class="fn">./gradlew</span> <span class="pn">test --info</span></div>
+      <h2 class="section-title">Achievements &amp; recognition</h2>
+      <div class="console" style="max-width:100%;">
+        <div class="console-head">Test Report — achievements.log</div>
+        <div class="console-body">
+          <div class="out-line"><span class="prompt">✓</span> <span class="val">1,550+ DSA problems solved</span> <span class="lbl">— 850+ on LeetCode, 700+ on GeeksforGeeks</span></div>
+          <div class="out-line"><span class="prompt">✓</span> <span class="val">Goldman Sachs, J.P. Morgan &amp; Infosys Power Programmer</span> <span class="lbl">— Virtual Job Simulations completed</span></div>
+          <div class="out-line"><span class="prompt">✓</span> <span class="val">Elastic Blogathon 2026 — Certificate of Participation</span> <span class="lbl">— selected among 100 participants nationwide, Elastic Technologies India</span></div>
+          <div class="out-line"><span class="prompt">✓</span> <span class="val">2nd Runner-up (3rd Rank) — BrainByte Battle</span> <span class="lbl">— Aditya University, via Unstop, representing NITMAS</span></div>
+          <div class="out-line" style="margin-top:10px;"><span class="prompt">&gt;</span> <span class="lbl">BUILD SUCCESSFUL</span> <span class="val">— 4 achievements, 0 failures</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="pane" style="border-bottom:none;">
+    <div class="gutter"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+    <div class="pane-body">
+      <div class="eyebrow"><span class="kw">public static void</span> <span class="fn">main</span><span class="pn">(String[] args)</span> <span class="pn">{</span></div>
+      <h2 class="section-title">Let's talk</h2>
+
+      <div class="term">
+        <div class="term-head"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>&nbsp;&nbsp;zsh — contact</div>
+        <div class="term-body">
+          <div class="term-line"><span class="p1">subhadip@dev</span><span class="p2">~/portfolio</span><span class="cmd">$ cat reach_me.txt</span></div>
+          <div class="contact-links">
+            <a href="mailto:subhadippati30@gmail.com"><svg class="c-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> subhadippati30@gmail.com <span class="arrow">→</span></a>
+            <a href="tel:+917699840895"><svg class="c-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.5 2.1L8 9.7a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.7 2Z"/></svg> +91 76998 40895 <span class="arrow">→</span></a>
+            <a href="https://www.linkedin.com/in/subhadippati01/" target="_blank" rel="noopener noreferrer"><svg class="c-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 11v5M8 8.5v.01M12 16v-3.2a1.8 1.8 0 0 1 3.6 0V16M12 12.8V16"/></svg> linkedin.com/in/subhadippati01 <span class="arrow">→</span></a>
+            <a href="https://github.com/Spati01" target="_blank" rel="noopener noreferrer"><svg class="c-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2-.2 4.5-1 4.5-4.5a3.5 3.5 0 0 0-1-2.5 3.3 3.3 0 0 0-.1-2.5s-.9-.3-2.9 1a10 10 0 0 0-5 0c-2-1.3-2.9-1-2.9-1a3.3 3.3 0 0 0-.1 2.5 3.5 3.5 0 0 0-1 2.5c0 3.5 2.5 4.3 4.5 4.5-.3.3-.5.7-.5 1.3v3.7"/></svg> github.com/Spati01 <span class="arrow">→</span></a>
+            <a href="https://leetcode.com/u/Subhadip01/" target="_blank" rel="noopener noreferrer"><svg class="c-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16 8-4-4-8 8 8 8 4-4"/><path d="M9 14h9"/></svg> leetcode.com/u/Subhadip01 <span class="arrow">→</span></a>
+            <a href="https://www.geeksforgeeks.org/profile/subhadippati30" target="_blank" rel="noopener noreferrer"><svg class="c-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 21a8 8 0 0 0 8-8h-8Z"/><path d="M12 13V5a8 8 0 0 0-8 8h8Z"/></svg> geeksforgeeks.org/profile/subhadippati30 <span class="arrow">→</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="statusbar">
+  <span>⎇ main</span>
+  <span>UTF-8</span>
+  <span>Java 8+</span>
+  <span class="ok">● BUILD SUCCESS</span>
+  <span>© 2026 Subhadip Pati</span>
+</footer>
+
+<button type="button" class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script>
+  /* ---------- Canvas starfield: twinkle + parallax, theme-aware, perf-conscious ---------- */
+  (function () {
+    const canvas = document.getElementById('starfieldCanvas');
+    if (!canvas || !canvas.getContext) return;
+    const ctx = canvas.getContext('2d');
+    const root = document.documentElement;
+
+    const reduceMotionMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const fineMQ = window.matchMedia('(pointer: fine)');
+    let reduceMotion = reduceMotionMQ.matches;
+
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let W = 0, H = 0;
+    let stars = [];
+    let rafId = null;
+    let running = false;
+    let lastT = 0;
+
+    // Parallax state (mouse target is eased toward for a smooth, non-twitchy drift)
+    let mouseNX = 0, mouseNY = 0, targetNX = 0, targetNY = 0;
+    let scrollY = window.scrollY || 0;
+
+    // Theme-derived color/opacity, refreshed only when the theme or accent actually changes
+    let starRGB = '255,255,255', minOp = .16, maxOp = 1, glowOp = .55, accentRGB = '227,168,94';
+    function readThemeVars() {
+      const cs = getComputedStyle(root);
+      starRGB = (cs.getPropertyValue('--star-rgb') || starRGB).trim();
+      minOp = parseFloat(cs.getPropertyValue('--star-min-op')) || minOp;
+      maxOp = parseFloat(cs.getPropertyValue('--star-max-op')) || maxOp;
+      glowOp = parseFloat(cs.getPropertyValue('--star-glow-op')) || glowOp;
+      accentRGB = (cs.getPropertyValue('--amber-rgb') || accentRGB).trim();
+    }
+
+    function starCountFor(w, h) {
+      const isSmall = w < 640;
+      const density = isSmall ? 13000 : 9000;
+      const count = Math.round((w * h) / density);
+      return Math.max(50, Math.min(isSmall ? 90 : 170, count));
+    }
+
+    function makeStars(w, h) {
+      const n = starCountFor(w, h);
+      const arr = new Array(n);
+      for (let i = 0; i < n; i++) {
+        const isGlow = Math.random() < 0.1;
+        arr[i] = {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: isGlow ? (1.4 + Math.random() * 1.3) : (0.5 + Math.random() * 1.2),
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.35 + Math.random() * 0.9,   // twinkle speed, rad/s-ish
+          depth: 0.25 + Math.random() * 0.85,  // parallax depth: farther stars move less
+          glow: isGlow,
+          accent: Math.random() < 0.08
+        };
+      }
+      return arr;
+    }
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.round(W * dpr));
+      canvas.height = Math.max(1, Math.round(H * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      stars = makeStars(W, H);
+    }
+
+    function draw(t) {
+      if (!running) return;
+      const dt = lastT ? (t - lastT) : 16;
+      lastT = t;
+
+      mouseNX += (targetNX - mouseNX) * 0.06;
+      mouseNY += (targetNY - mouseNY) * 0.06;
+
+      ctx.clearRect(0, 0, W, H);
+
+      const maxParallax = 16;     // px of mouse parallax at depth = 1
+      const scrollFactor = 0.015; // px of drift per px scrolled, at depth = 1
+
+      for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        if (!reduceMotion) s.phase += (dt / 1000) * s.speed;
+        const tw = 0.5 + 0.5 * Math.sin(s.phase);
+        const alpha = reduceMotion ? (minOp + maxOp) / 2 : (minOp + (maxOp - minOp) * tw);
+
+        let px = s.x, py = s.y;
+        if (!reduceMotion) {
+          px += mouseNX * maxParallax * s.depth;
+          const drift = Math.max(-40, Math.min(40, scrollY * scrollFactor * s.depth));
+          py += mouseNY * maxParallax * s.depth + drift;
+        }
+
+        const rgb = s.accent ? accentRGB : starRGB;
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${rgb},${alpha})`;
+        if (s.glow) {
+          ctx.shadowColor = `rgba(${rgb},${glowOp})`;
+          ctx.shadowBlur = 5 + s.r * 2;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+        ctx.arc(px, py, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.shadowBlur = 0;
+
+      if (!reduceMotion) rafId = requestAnimationFrame(draw);
+      else running = false;
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      lastT = 0;
+      if (reduceMotion) draw(performance.now());
+      else rafId = requestAnimationFrame(draw);
+    }
+    function stop() {
+      running = false;
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+
+    let resizeTimer = null;
+    function onResize() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        resize();
+        if (reduceMotion) draw(performance.now());
+      }, 150);
+    }
+
+    function onMouseMove(e) {
+      if (!fineMQ.matches || reduceMotion) return;
+      targetNX = (e.clientX / window.innerWidth) * 2 - 1;
+      targetNY = (e.clientY / window.innerHeight) * 2 - 1;
+    }
+
+    readThemeVars();
+    resize();
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('scroll', () => { scrollY = window.scrollY || 0; }, { passive: true });
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop(); else start();
+    });
+    if (reduceMotionMQ.addEventListener) {
+      reduceMotionMQ.addEventListener('change', (e) => {
+        reduceMotion = e.matches;
+        stop();
+        start();
+      });
+    }
+
+    // Re-read colors whenever the theme toggle or accent picker changes root's attributes/style —
+    // avoids querying computed style every animation frame.
+    new MutationObserver(readThemeVars).observe(root, { attributes: true, attributeFilter: ['data-theme', 'style'] });
+
+    start();
+  })();
+
+  /* ---------- Ambient cursor glow (desktop, fine-pointer only; CSS handles the accent color live) ---------- */
+  (function () {
+    const glow = document.getElementById('cursorGlow');
+    if (!glow) return;
+    if (!window.matchMedia('(pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let x = window.innerWidth / 2, y = window.innerHeight / 2;
+    let tx = x, ty = y;
+    let raf = null;
+
+    function loop() {
+      x += (tx - x) * 0.1;
+      y += (ty - y) * 0.1;
+      glow.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      raf = requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      tx = e.clientX; ty = e.clientY;
+      glow.classList.add('active');
+      if (!raf) raf = requestAnimationFrame(loop);
+    }, { passive: true });
+
+    window.addEventListener('mouseleave', () => glow.classList.remove('active'));
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && raf) { cancelAnimationFrame(raf); raf = null; }
+      else if (!document.hidden && !raf) { raf = requestAnimationFrame(loop); }
+    });
+  })();
+
+  /* ---------- Back to top ---------- */
+  (function () {
+    const btn = document.getElementById('backToTop');
+    if (!btn) return;
+    const reduceMotionMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let ticking = false;
+    function update() {
+      btn.classList.toggle('visible', window.scrollY > 480);
+      ticking = false;
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) { requestAnimationFrame(update); ticking = true; }
+    }, { passive: true });
+    btn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: reduceMotionMQ.matches ? 'auto' : 'smooth' });
+    });
+    update();
+  })();
+
+  /* ---------- Stagger index for skill-badge / project-card / commit entrance animations ---------- */
+  (function () {
+    document.querySelectorAll('.dep-list, .proj-list, .commits').forEach(list => {
+      [...list.children].forEach((el, i) => el.style.setProperty('--i', i));
+    });
+  })();
+
+  const tabs = document.querySelectorAll('.tab');
+  const sections = [...tabs].map(t => document.getElementById(t.dataset.target));
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', e => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.target === id));
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+
+  sections.forEach(s => s && observer.observe(s));
+
+  /* ---------- Scroll reveal for sections ---------- */
+  (function () {
+    const revealTargets = document.querySelectorAll('main > section:not(.hero) .pane-body');
+    if (!revealTargets.length) return;
+    revealTargets.forEach(el => el.classList.add('reveal'));
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    revealTargets.forEach(el => revealObserver.observe(el));
+  })();
+
+  /* ---------- Sticky header depth + scroll progress ---------- */
+  (function () {
+    const chrome = document.querySelector('.chrome');
+    const progress = document.getElementById('scrollProgress');
+    if (!chrome) return;
+    let ticking = false;
+    function update() {
+      chrome.classList.toggle('scrolled', window.scrollY > 8);
+      if (progress) {
+        const doc = document.documentElement;
+        const max = doc.scrollHeight - doc.clientHeight;
+        const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+        progress.style.width = pct + '%';
+      }
+      ticking = false;
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) { requestAnimationFrame(update); ticking = true; }
+    }, { passive: true });
+    window.addEventListener('resize', () => { if (!ticking) { requestAnimationFrame(update); ticking = true; } }, { passive: true });
+    update();
+  })();
+
+  /* ---------- Terminal typing animation ---------- */
+  (function () {
+    const body = document.getElementById('typeTermBody');
+    if (!body) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const lines = [
+      { cmd: '$ whoami', out: 'Subhadip — Java Backend Developer' },
+      { cmd: '$ cat skills.txt', out: 'Java + Spring Boot + REST APIs' },
+      { cmd: '$ echo $STATUS', out: 'building reliable backend systems...' },
+      { cmd: '$ solved --count dsa', out: '1550+ problems and counting 🚀' }
+    ];
+
+    // If the user prefers reduced motion, render the final state instantly.
+    if (reduceMotion) {
+      body.innerHTML = lines.map(l =>
+        `<div class="tt-line"><span class="tt-prompt-sym">$</span> <span class="tt-cmd">${l.cmd.replace(/^\$\s*/, '')}</span><span class="tt-out">${l.out}</span></div>`
+      ).join('');
+      return;
+    }
+
+    const TYPE_SPEED = 45;      // ms per character while typing a command
+    const AFTER_CMD_PAUSE = 250; // pause after command finishes, before output shows
+    const AFTER_OUT_PAUSE = 1100; // pause after output shows, before next line
+    const END_PAUSE = 2200;      // pause after full sequence before restarting
+    const CLEAR_PAUSE = 400;
+
+    let lineIndex = 0;
+    let charIndex = 0;
+    let currentLineEl = null;
+    let cmdSpan = null;
+    let cursorSpan = null;
+
+    function startLine() {
+      const line = lines[lineIndex];
+      currentLineEl = document.createElement('div');
+      currentLineEl.className = 'tt-line';
+      currentLineEl.innerHTML = '<span class="tt-prompt-sym">$</span> <span class="tt-cmd"></span><span class="tt-cursor"></span>';
+      body.appendChild(currentLineEl);
+      cmdSpan = currentLineEl.querySelector('.tt-cmd');
+      cursorSpan = currentLineEl.querySelector('.tt-cursor');
+      charIndex = 0;
+      typeChar(line.cmd.replace(/^\$\s*/, ''));
+    }
+
+    function typeChar(text) {
+      if (charIndex <= text.length) {
+        cmdSpan.textContent = text.slice(0, charIndex);
+        charIndex++;
+        setTimeout(() => typeChar(text), TYPE_SPEED);
+      } else {
+        setTimeout(showOutput, AFTER_CMD_PAUSE);
+      }
+    }
+
+    function showOutput() {
+      if (cursorSpan) cursorSpan.remove();
+      const out = document.createElement('span');
+      out.className = 'tt-out';
+      out.innerHTML = `<span class="val">${lines[lineIndex].out}</span>`;
+      currentLineEl.appendChild(out);
+
+      lineIndex++;
+      if (lineIndex < lines.length) {
+        setTimeout(startLine, AFTER_OUT_PAUSE);
+      } else {
+        setTimeout(resetSequence, END_PAUSE);
+      }
+    }
+
+    function resetSequence() {
+      body.style.opacity = '0';
+      setTimeout(() => {
+        body.innerHTML = '';
+        body.style.opacity = '1';
+        lineIndex = 0;
+        setTimeout(startLine, CLEAR_PAUSE);
+      }, 250);
+    }
+
+    body.style.transition = 'opacity .25s ease';
+    startLine();
+  })();
+
+  /* ---------- Theme + accent controls ---------- */
+  (function () {
+    var root = document.documentElement;
+    var toggle = document.getElementById('themeToggle');
+    var picker = document.getElementById('accentPicker');
+    var swatches = picker ? picker.querySelectorAll('.accent-swatch') : [];
+
+    // --- tiny color helpers, used to derive a readable text variant of the accent ---
+    function hexToRgb(hex) {
+      hex = hex.replace('#', '');
+      if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
+      var num = parseInt(hex, 16);
+      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+    }
+    function rgbToHsl(r, g, b) {
+      r /= 255; g /= 255; b /= 255;
+      var max = Math.max(r, g, b), min = Math.min(r, g, b);
+      var h, s, l = (max + min) / 2;
+      if (max === min) { h = s = 0; }
+      else {
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          default: h = (r - g) / d + 4;
+        }
+        h /= 6;
+      }
+      return { h: h, s: s, l: l };
+    }
+    function hslToHex(h, s, l) {
+      function hue2rgb(p, q, t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      }
+      var r, g, b;
+      if (s === 0) { r = g = b = l; }
+      else {
+        var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        var p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1 / 3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3);
+      }
+      var toHex = function (c) {
+        var v = Math.round(c * 255).toString(16);
+        return v.length === 1 ? '0' + v : v;
+      };
+      return '#' + toHex(r) + toHex(g) + toHex(b);
+    }
+
+    // Derives a foreground-safe variant of the accent for the active theme,
+    // so accent text stays readable on both dark and light backgrounds.
+    function foregroundVariant(hex, isLight) {
+      if (!isLight) return hex;
+      try {
+        var rgb = hexToRgb(hex);
+        var hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+        var l = Math.min(hsl.l, 0.36);
+        var s = Math.max(hsl.s, 0.5);
+        return hslToHex(hsl.h, s, l);
+      } catch (e) { return hex; }
+    }
+
+    function isLightTheme() {
+      return root.getAttribute('data-theme') === 'light';
+    }
+    function currentAccent() {
+      var v = getComputedStyle(root).getPropertyValue('--amber').trim();
+      return v || '#e3a85e';
+    }
+    function refreshForeground() {
+      root.style.setProperty('--amber-fg', foregroundVariant(currentAccent(), isLightTheme()));
+    }
+
+    function setTheme(theme) {
+      if (theme === 'light') root.setAttribute('data-theme', 'light');
+      else root.removeAttribute('data-theme');
+      try { localStorage.setItem('portfolio-theme', theme); } catch (e) {}
+      refreshForeground();
+    }
+
+    function hexToRgbString(hex) {
+      var rgb = hexToRgb(hex);
+      return rgb.r + ',' + rgb.g + ',' + rgb.b;
+    }
+
+    function setAccent(color) {
+      root.style.setProperty('--amber', color);
+      root.style.setProperty('--amber-rgb', hexToRgbString(color));
+      try { localStorage.setItem('portfolio-accent', color); } catch (e) {}
+      refreshForeground();
+    }
+
+    if (toggle) {
+      toggle.addEventListener('click', function () {
+        setTheme(isLightTheme() ? 'dark' : 'light');
+      });
+    }
+
+    if (swatches.length) {
+      try {
+        var savedAccent = localStorage.getItem('portfolio-accent');
+        if (savedAccent) {
+          swatches.forEach(function (s) {
+            s.classList.toggle('active', s.dataset.accent.toLowerCase() === savedAccent.toLowerCase());
+          });
+        }
+      } catch (e) {}
+
+      swatches.forEach(function (swatch) {
+        swatch.addEventListener('click', function () {
+          swatches.forEach(function (s) { s.classList.remove('active'); });
+          swatch.classList.add('active');
+          setAccent(swatch.dataset.accent);
+        });
+      });
+    }
+
+    // Compute the initial foreground variant for whatever theme/accent loaded.
+    refreshForeground();
+  })();
+</script>
+
+</body>
+</html>
