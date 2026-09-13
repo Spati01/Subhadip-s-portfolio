@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
 <title>Subhadip Pati — Java Backend Developer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,11 +13,15 @@
     try {
       var root = document.documentElement;
       var savedTheme = localStorage.getItem('portfolio-theme');
-      if (!savedTheme) {
-        savedTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      if (savedTheme !== 'light' && savedTheme !== 'dark') {
+        // Keep one deterministic default across desktop and mobile.
+        // The user's explicit choice is persisted and always wins on later loads.
+        savedTheme = 'dark';
       }
       var isLight = savedTheme === 'light';
-      if (isLight) root.setAttribute('data-theme', 'light');
+      // Always set the theme explicitly. This avoids mobile browsers interpreting
+      // the absence of data-theme as their own preferred light color scheme.
+      root.setAttribute('data-theme', savedTheme);
 
       var savedBgTheme = localStorage.getItem('portfolio-bg-theme');
       if (savedBgTheme && savedBgTheme !== 'default' && savedBgTheme !== 'light') {
@@ -965,7 +970,7 @@ h2.section-title::after{
   position:absolute;
   right:0;bottom:70px;
   width:340px;
-  height:min(560px, 72vh);
+  height:min(560px, 72dvh);
   max-width:calc(100vw - 24px);
   background:var(--bg-elevated);
   border:1px solid var(--border);
@@ -1737,6 +1742,625 @@ section[id]{
 
 
 
+
+/* ================================================================
+   FINAL RESPONSIVE + THEME COMPATIBILITY PASS
+   Keeps the existing design/functionality while hardening mobile,
+   tablet and light/dark rendering across modern browsers.
+   ================================================================ */
+
+:root{
+  color-scheme:dark;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  --button-ink:#14161a;
+}
+[data-theme="light"]{
+  color-scheme:light;
+}
+
+/* Prevent browser-specific form/control colors from overriding the theme. */
+html,body{
+  width:100%;
+  min-width:0;
+  min-height:100%;
+  background-color:var(--bg);
+}
+button,input,textarea,select{
+  font:inherit;
+  color:inherit;
+  -webkit-appearance:none;
+  appearance:none;
+}
+input::placeholder,textarea::placeholder{
+  color:var(--text-faint);
+  opacity:1;
+}
+button{
+  -webkit-tap-highlight-color:transparent;
+}
+img,svg,canvas,video{
+  max-width:100%;
+}
+main,.container,.pane,.pane-body{
+  min-width:0;
+}
+.container{
+  width:100%;
+}
+
+/* Explicit light-theme text tokens for elements that intentionally use
+   white in the dark theme. */
+[data-theme="light"] .hero-name,
+[data-theme="light"] h2.section-title,
+[data-theme="light"] .proj-name,
+[data-theme="light"] .commit-msg,
+[data-theme="light"] .stat-num{
+  color:var(--text);
+}
+
+/* Avoid fixed white decorative layers becoming visually harsh in light mode. */
+[data-theme="light"] .hero::after,
+[data-theme="light"] .hero::before{
+  opacity:.42;
+}
+
+/* Make accent-filled controls use a contrast-safe foreground. */
+.btn-primary,
+.ai-send{
+  color:var(--button-ink);
+}
+
+/* Safe glass fallbacks for browsers that do not support color-mix. */
+@supports not (background:color-mix(in srgb, white 50%, transparent)){
+  .chrome{background:var(--bg-panel);}
+  .ai-panel,.dep-file,.console,.type-term,.term,.recruiter-card,.stat-card,.gh-dashboard{
+    background:var(--bg-elevated);
+  }
+  .ai-inputrow,.ai-quickwrap{background:var(--bg-elevated);}
+  .status-badge{background:var(--bg-elevated);}
+  .side-card{background:var(--bg-elevated);}
+  .toast{background:var(--bg-elevated);}
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width:900px){
+  .container{padding-left:0;padding-right:0;}
+  .pane-body{padding-left:24px;padding-right:24px;}
+  .chrome-titlebar{padding-left:14px;padding-right:14px;}
+  .tab{padding-left:15px;padding-right:15px;}
+  .hero-desc,.about-lede,.proj-desc,.commit-body{max-width:none;}
+  .ai-panel{width:min(380px,calc(100vw - 24px));}
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width:720px){
+  html,body{
+    width:100%;
+    overflow-x:clip;
+  }
+  @supports not (overflow:clip){
+    html,body{overflow-x:hidden;}
+  }
+
+  .chrome{
+    position:sticky;
+    top:0;
+  }
+
+  .chrome-titlebar{
+    min-height:52px;
+    padding-top:max(8px,env(safe-area-inset-top));
+  }
+
+  .prefs{
+    gap:8px;
+    padding-left:6px;
+  }
+
+  .theme-toggle,
+  .customizer-btn{
+    width:40px;
+    height:40px;
+    min-width:40px;
+    min-height:40px;
+  }
+
+  .tabs{
+    max-width:100%;
+    overscroll-behavior-x:contain;
+  }
+
+  .tab{
+    min-height:44px;
+    padding:11px 14px;
+    font-size:12px;
+  }
+
+  .pane{
+    grid-template-columns:28px minmax(0,1fr);
+  }
+
+  .gutter{
+    padding:36px 0;
+    overflow:hidden;
+  }
+
+  .gutter span{
+    padding-right:6px;
+    font-size:9.5px;
+  }
+
+  .pane-body{
+    min-width:0;
+    width:100%;
+    padding:36px 16px;
+  }
+
+  .hero .pane-body{
+    padding-top:30px;
+  }
+
+  .hero-name{
+    font-size:clamp(32px,11vw,48px);
+    line-height:1.04;
+  }
+
+  .hero-role{
+    font-size:13px;
+    line-height:1.55;
+    overflow-wrap:anywhere;
+  }
+
+  .hero-desc,
+  .about-lede,
+  .proj-desc,
+  .commit-body{
+    font-size:14.5px;
+    line-height:1.65;
+    overflow-wrap:anywhere;
+  }
+
+  .status-badge{
+    max-width:100%;
+    align-items:flex-start;
+    line-height:1.45;
+    padding:8px 12px 8px 10px;
+  }
+
+  .hero-actions,
+  .quick-links,
+  .proj-links{
+    width:100%;
+  }
+
+  .hero-actions{
+    gap:8px;
+  }
+
+  .hero-actions .btn{
+    flex:1 1 100%;
+    justify-content:center;
+    width:100%;
+  }
+
+  .quick-links{
+    gap:8px 14px;
+    margin-bottom:34px;
+  }
+
+  .quick-links a{
+    min-height:40px;
+    padding:9px 2px;
+  }
+
+  .console,
+  .type-term,
+  .term,
+  .dep-file,
+  .recruiter-card,
+  .gh-dashboard{
+    width:100%;
+    max-width:100%;
+  }
+
+  .console-body,
+  .type-term-body,
+  .term-body{
+    padding-left:14px;
+    padding-right:14px;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+  }
+
+  .console-body{
+    font-size:12px;
+  }
+
+  .type-term-body{
+    font-size:12px;
+    min-height:170px;
+  }
+
+  .field-row{
+    grid-template-columns:1fr;
+    gap:3px;
+    padding:11px 0;
+  }
+
+  .field-key{
+    font-size:11.5px;
+  }
+
+  .field-val{
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+
+  .dep-group{
+    padding-left:14px;
+    padding-right:14px;
+  }
+
+  .dep-list{
+    gap:7px;
+  }
+
+  .dep{
+    max-width:100%;
+    font-size:11.5px;
+    padding:7px 9px;
+    overflow-wrap:anywhere;
+  }
+
+  .dep .ver{
+    overflow-wrap:anywhere;
+  }
+
+  .proj{
+    padding:16px 14px;
+  }
+
+  .proj-head{
+    align-items:flex-start;
+  }
+
+  .proj-name{
+    font-size:14px;
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+
+  .proj-stat{
+    white-space:normal;
+    font-size:11px;
+  }
+
+  .proj-tags{
+    gap:6px;
+  }
+
+  .tag{
+    font-size:10.5px;
+    padding:4px 8px;
+  }
+
+  .proj-links{
+    gap:8px 16px;
+  }
+
+  .proj-links a{
+    min-height:40px;
+    padding:9px 0;
+  }
+
+  .commit{
+    grid-template-columns:16px minmax(0,1fr);
+    gap:10px;
+  }
+
+  .commit-msg{
+    font-size:15px;
+  }
+
+  .commit-meta,
+  .commit-hash{
+    font-size:11px;
+    overflow-wrap:anywhere;
+  }
+
+  .commit-duration{
+    margin-left:4px;
+    padding:2px 7px;
+  }
+
+  .stat-row{
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+
+  .stat-card{
+    padding:17px 15px;
+  }
+
+  .stat-num{
+    font-size:34px;
+  }
+
+  .recruiter-toggle .btn{
+    width:100%;
+    justify-content:center;
+  }
+
+  .recruiter-card.open{
+    max-height:900px;
+  }
+
+  .recruiter-card-inner{
+    padding:15px;
+  }
+
+  .recruiter-grid{
+    grid-template-columns:1fr;
+  }
+
+  .gh-dashboard-head{
+    align-items:flex-start;
+  }
+
+  .gh-dashboard-title{
+    min-width:0;
+    flex-wrap:wrap;
+  }
+
+  .gh-dashboard-user{
+    overflow-wrap:anywhere;
+  }
+
+  .gh-dashboard-body{
+    padding:14px;
+  }
+
+  .gh-repo-grid{
+    grid-template-columns:1fr;
+  }
+
+  .statusbar{
+    padding:10px 14px;
+    justify-content:flex-start;
+  }
+
+  .back-to-top{
+    right:max(14px,env(safe-area-inset-right));
+    bottom:max(14px,env(safe-area-inset-bottom));
+    width:44px;
+    height:44px;
+  }
+
+  .ai-widget{
+    right:max(14px,env(safe-area-inset-right));
+    bottom:calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .ai-fab{
+    width:52px;
+    height:52px;
+    min-width:52px;
+    min-height:52px;
+    border-radius:14px;
+  }
+
+  .ai-panel{
+    right:0;
+    width:min(380px,calc(100vw - 28px));
+    max-width:calc(100vw - 28px);
+    height:min(620px,calc(100dvh - 120px));
+    max-height:calc(100dvh - 120px);
+    border-radius:14px;
+  }
+
+  .ai-panel-head{
+    min-height:56px;
+    padding:10px 10px 10px 12px;
+  }
+
+  .ai-panel-close{
+    width:40px;
+    height:40px;
+    min-width:40px;
+    min-height:40px;
+  }
+
+  .ai-messages{
+    padding:12px;
+    gap:10px;
+  }
+
+  .ai-bubble{
+    max-width:min(78vw,260px);
+    overflow-wrap:anywhere;
+    font-size:13px;
+  }
+
+  .ai-actioncards{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .ai-actioncard{
+    min-height:68px;
+    padding:10px;
+  }
+
+  .ai-chip{
+    min-height:40px;
+    padding:8px 11px;
+  }
+
+  .ai-inputrow{
+    padding:10px 12px max(10px,env(safe-area-inset-bottom));
+  }
+
+  .ai-input{
+    min-height:44px;
+    height:44px;
+    font-size:16px; /* prevents iOS Safari zoom on focus */
+    padding:9px 11px;
+  }
+
+  .ai-send{
+    width:44px;
+    height:44px;
+    min-width:44px;
+    min-height:44px;
+    border-radius:8px;
+  }
+
+  .customizer-panel{
+    max-height:calc(100dvh - 32px);
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+
+/* ---------- Small phones ---------- */
+@media (max-width:480px){
+  .chrome-titlebar{
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .dot{
+    width:9px;
+    height:9px;
+  }
+
+  .pane{
+    grid-template-columns:22px minmax(0,1fr);
+  }
+
+  .gutter span{
+    padding-right:4px;
+    font-size:8.5px;
+  }
+
+  .pane-body{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .hero .pane-body{
+    padding-top:26px;
+  }
+
+  .section-title{
+    max-width:100%;
+  }
+
+  h2.section-title{
+    font-size:clamp(23px,8vw,29px);
+  }
+
+  .hero-name{
+    font-size:clamp(30px,12vw,43px);
+  }
+
+  .hero-actions .btn{
+    min-height:46px;
+  }
+
+  .type-term-body{
+    min-height:185px;
+    font-size:11.5px;
+  }
+
+  .ai-panel{
+    right:-2px;
+    width:calc(100vw - 24px);
+    max-width:calc(100vw - 24px);
+    height:min(640px,calc(100dvh - 108px));
+    max-height:calc(100dvh - 108px);
+  }
+
+  .ai-actioncards{
+    grid-template-columns:1fr;
+  }
+
+  .ai-actioncard{
+    min-height:58px;
+  }
+
+  .toast{
+    max-width:calc(100vw - 28px);
+    text-align:center;
+  }
+}
+
+/* ---------- Very narrow devices ---------- */
+@media (max-width:360px){
+  .prefs{
+    gap:5px;
+  }
+
+  .theme-toggle,
+  .customizer-btn{
+    width:38px;
+    height:38px;
+    min-width:38px;
+  }
+
+  .tab{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .pane{
+    grid-template-columns:20px minmax(0,1fr);
+  }
+
+  .pane-body{
+    padding-left:10px;
+    padding-right:10px;
+  }
+
+  .ai-panel{
+    width:calc(100vw - 18px);
+    max-width:calc(100vw - 18px);
+  }
+
+  .ai-bubble{
+    max-width:72vw;
+  }
+}
+
+/* Touch devices: remove hover-only movement that can feel sticky on phones. */
+@media (hover:none), (pointer:coarse){
+  .btn-primary:hover,
+  .btn-ghost:hover,
+  .proj:hover,
+  .stat-card:hover,
+  .dep:hover,
+  .recruiter-item:hover,
+  .ai-actioncard:hover,
+  .ai-chip:hover{
+    transform:none;
+  }
+
+  .quick-links a:hover,
+  .proj-links a:hover,
+  .contact-links a:hover{
+    transform:none;
+    padding-left:0;
+  }
+}
+
+/* Respect safe areas and prevent accidental selection while tapping controls. */
+@supports (padding:max(0px)){
+  .chrome-titlebar{
+    padding-left:max(10px,env(safe-area-inset-left));
+    padding-right:max(10px,env(safe-area-inset-right));
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1861,8 +2485,8 @@ section[id]{
         <p class="tt-sr-only">
           $ whoami — Subhadip, Java Backend Developer.
           $ cat skills.txt — Java + Spring Boot + REST APIs.
-          $ echo $STATUS — Building reliable backend systems.
-          $ solved --count DSA — 1550+ problems and counting.
+          $ echo $STATUS — building reliable backend systems.
+          $ solved --count dsa — 1550+ problems and counting.
         </p>
       </div>
 
@@ -1870,7 +2494,7 @@ section[id]{
         <a href="#projects" class="btn btn-primary btn-magnetic">View Projects →</a>
         <a href="#contact" class="btn btn-ghost">Get in touch</a>
         <!-- TODO: replace with your real Google Drive share link -->
-        <a href="https://drive.google.com/file/d/1PtONQzlZeH3jHVSwQWG0HteaRBsTCZTx/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">↓ Resume.pdf</a>
+        <a href="YOUR_GOOGLE_DRIVE_LINK" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">↓ Resume.pdf</a>
       </div>
 
       <div class="recruiter-toggle">
@@ -1886,7 +2510,7 @@ section[id]{
             Everything a recruiter needs, in one place
           </div>
           <div class="recruiter-grid">
-            <a class="recruiter-item" href="https://drive.google.com/file/d/1PtONQzlZeH3jHVSwQWG0HteaRBsTCZTx/view?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <a class="recruiter-item" href="YOUR_GOOGLE_DRIVE_LINK" target="_blank" rel="noopener noreferrer">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
               <span><span class="ri-label">Resume</span><span class="ri-val">Download PDF</span></span>
             </a>
@@ -3170,10 +3794,12 @@ section[id]{
     }
 
     function setTheme(theme) {
-      if (theme === 'light') root.setAttribute('data-theme', 'light');
-      else root.removeAttribute('data-theme');
+      theme = theme === 'light' ? 'light' : 'dark';
+      root.setAttribute('data-theme', theme);
       try { localStorage.setItem('portfolio-theme', theme); } catch (e) {}
       refreshForeground();
+      // Keep the browser's native controls synchronized with the active theme.
+      try { document.documentElement.style.colorScheme = theme; } catch (e) {}
     }
 
     function hexToRgbString(hex) {
@@ -3661,6 +4287,140 @@ section[id]{
     if (suggestionsEl) suggestionsEl.addEventListener('click', onChipClick);
     if (categoriesEl) categoriesEl.addEventListener('click', onChipClick);
   })();
+</script>
+
+
+<style>
+/* ================================================================
+   MOBILE-FIRST THEME SYSTEM HARDENING
+   One theme state, one control system, every viewport.
+   ================================================================ */
+html[data-theme="dark"] { color-scheme: dark; }
+html[data-theme="light"] { color-scheme: light; }
+
+html, body {
+  background-color: var(--bg) !important;
+  color: var(--text);
+}
+
+/* Theme controls stay above sticky/backdrop layers on touch devices. */
+.chrome-titlebar, .prefs, .customizer, .theme-toggle, .customizer-btn {
+  position: relative;
+}
+.chrome-titlebar { z-index: 170; }
+.prefs { z-index: 180; }
+.customizer { z-index: 190; }
+.theme-toggle, .customizer-btn { z-index: 191; }
+
+/* Never let mobile browser form-control defaults override theme tokens. */
+button, input, textarea, select {
+  color-scheme: inherit;
+  accent-color: var(--amber-fg);
+}
+
+/* Explicitly theme common browser UI surfaces. */
+::selection { background: var(--amber); color: var(--button-ink); }
+
+@media (max-width: 720px) {
+  .chrome-titlebar {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+
+  .chrome-titlebar .prefs {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex: 0 0 auto;
+    margin-left: auto;
+  }
+
+  .theme-toggle, .customizer-btn {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+  }
+
+  .customizer-panel {
+    position: fixed !important;
+    top: calc(env(safe-area-inset-top) + 62px);
+    right: max(10px, env(safe-area-inset-right));
+    left: max(10px, env(safe-area-inset-left));
+    bottom: auto !important;
+    width: auto !important;
+    max-width: none;
+    max-height: calc(100dvh - env(safe-area-inset-top) - 82px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 9999;
+  }
+
+  .customizer.open .customizer-panel {
+    transform: translateY(0) scale(1);
+  }
+
+  .customizer-swatch {
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 380px) {
+  .chrome-titlebar { padding-left: 8px; padding-right: 8px; }
+  .theme-toggle, .customizer-btn {
+    width: 40px; height: 40px; min-width: 40px; min-height: 40px;
+  }
+  .prefs { gap: 6px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html, body, body * {
+    transition-property: background-color, color, border-color, box-shadow, fill, stroke;
+  }
+}
+</style>
+
+<script>
+/* ---------- Final cross-device theme contrast hardening ---------- */
+(function () {
+  const root = document.documentElement;
+
+  function hexToRgb(hex) {
+    hex = String(hex || '').replace('#','').trim();
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const n = parseInt(hex, 16);
+    if (!Number.isFinite(n)) return {r:227,g:168,b:94};
+    return { r:(n >> 16) & 255, g:(n >> 8) & 255, b:n & 255 };
+  }
+
+  function relativeLuminance(hex) {
+    const {r,g,b} = hexToRgb(hex);
+    const channel = c => {
+      c /= 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+  }
+
+  function syncAccentContrast() {
+    const accent = getComputedStyle(root).getPropertyValue('--amber').trim() || '#e3a85e';
+    const ink = relativeLuminance(accent) > 0.52 ? '#14161a' : '#ffffff';
+    root.style.setProperty('--button-ink', ink);
+  }
+
+  syncAccentContrast();
+
+  new MutationObserver(syncAccentContrast).observe(root, {
+    attributes: true,
+    attributeFilter: ['data-theme', 'style']
+  });
+})();
 </script>
 
 </body>
